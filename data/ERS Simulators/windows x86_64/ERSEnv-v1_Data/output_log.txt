@@ -1,0 +1,166 @@
+Initialize engine version: 2017.1.0f3 (472613c02cf7)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GPU (ID=0x134b)
+    Vendor:   NVIDIA
+    VRAM:     996 MB
+    Driver:   21.21.13.7651
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.Timeline.dll (this message is harmless)
+Loading C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\UnityEngine.Timeline.dll into Unity Child Domain
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\System.dll (this message is harmless)
+Platform assembly: C:\Users\Abhinav Bhatia\Documents\workspace\ERS Simulator\bin\windows x86_64\ERSEnv-v1_Data\Managed\System.Core.dll (this message is harmless)
+- Completed reload, in  0.212 seconds
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 4.730668 ms
+Registered ambulance. id no: 0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 2
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 3
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 4
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 5
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 6
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 7
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 8
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 9
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 10
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 11
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 12
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 13
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 14
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 15
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 16
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered ambulance. id no: 17
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 2
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 3
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 4
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered base. id no: 5
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 2
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 3
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 4
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 5
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 6
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 7
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Registered hospital. id no: 8
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+ERS Simulator bound to port 7710
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+ERS Simulator bound to port 7710
+Setting up 2 worker threads for Enlighten.
+  Thread -> id: 3b7c -> priority: 1 
+  Thread -> id: 2174 -> priority: 1 
