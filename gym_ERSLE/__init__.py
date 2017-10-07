@@ -14,7 +14,7 @@ elif platform.system() == 'Darwin':
 else:
     extn = ''
 
-for env_name in ['ERSEnv-v0', 'ERSEnv-v1']:
+for env_name in ['ERSEnv-v0', 'ERSEnv-v1', 'ERSEnv-v2']:
     register(
         id=env_name,
         entry_point='gym_ERSLE:ERSEnv',

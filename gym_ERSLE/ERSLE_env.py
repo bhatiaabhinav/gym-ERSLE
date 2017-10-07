@@ -6,6 +6,10 @@ import subprocess
 import time
 import struct
 import numpy as np
+try:
+    import ujson as json # Not necessary for monitor writing, but very useful for monitor loading
+except ImportError:
+    import json
 
 REMOTE_STARTING_PORT_NO = 7710
 REMOTE_MAX_PORT_NO = 8000
@@ -34,12 +38,14 @@ class ERSEnv(gym.Env):
 
     def _step(self, action):
         self.sock.sendto(("step " + str(action)).encode(), self.REMOTE_SOCKET_ADDRESS)
-        msg_data, msg_addr = self.sock.recvfrom(4 * (self.observation_space.shape[0] + 2))
-        msg_data_float = struct.unpack("<%df" % (self.observation_space.shape[0] + 2), msg_data)
+        fixed_length_part = 4 * (self.observation_space.shape[0] + 2) # obs and reward and isTerminal
+        msg_data, msg_addr = self.sock.recvfrom(fixed_length_part + 2048)
+        msg_data_float = struct.unpack("<%df" % (self.observation_space.shape[0] + 2), msg_data[:fixed_length_part])
         obs = np.array(msg_data_float[:-2]).reshape(self.observation_space.shape)
         reward = msg_data_float[-2]
         isTerminal = msg_data_float[-1] > 0
-        return (obs, reward, isTerminal, {})
+        info_msg = msg_data[fixed_length_part:].decode()
+        return (obs, reward, isTerminal, json.loads(info_msg))
 
     def _reset(self):
         self.sock.sendto("reset".encode(), self.REMOTE_SOCKET_ADDRESS)
@@ -81,3 +87,11 @@ class ERSEnv(gym.Env):
         msg_data, msg_addr = self.sock.recvfrom(1024)
         #print(str(msg_addr) + " replied: " + msg_data.decode())
         return msg_data.decode()
+
+if __name__ == '__main__':
+    import gym
+    import gym_ERSLE
+    env = gym.make('ERSEnv-v2')
+    obs = env.reset()
+    obs, r, d, info = env.step(0)
+    env.close()
