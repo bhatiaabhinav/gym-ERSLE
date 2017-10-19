@@ -91,7 +91,9 @@ class ERSEnv(gym.Env):
 if __name__ == '__main__':
     import gym
     import gym_ERSLE
-    env = gym.make('ERSEnv-v2')
+    env = gym.make('ERSEnv-v3')
     obs = env.reset()
-    obs, r, d, info = env.step(0)
+    for i in range(10000):
+        obs, r, d, info = env.step(0)
+        if d: obs = env.reset()
     env.close()
