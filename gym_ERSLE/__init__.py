@@ -14,11 +14,19 @@ elif platform.system() == 'Darwin':
 else:
     extn = ''
 
-for env_name in ['ERSEnv-v0', 'ERSEnv-v1', 'ERSEnv-v2', 'ERSEnv-v3']:
+for env_no in range(4):
+    env_name = 'ERSEnv-v{0}'.format(env_no)
     register(
         id=env_name,
         entry_point='gym_ERSLE:ERSEnv',
-        kwargs={'exe_path': os.path.join(app_dir, env_name) + extn },
+        kwargs={'exe_path': os.path.join(app_dir, env_name) + extn, 'image_observation_space': False },
+        max_episode_steps = 10000000,
+        nondeterministic=False
+    )
+    register(
+        id='ERSEnv-image-v{0}'.format(env_no),
+        entry_point='gym_ERSLE:ERSEnv',
+        kwargs={'exe_path': os.path.join(app_dir, env_name) + extn, 'image_observation_space': True },
         max_episode_steps = 10000000,
         nondeterministic=False
     )
