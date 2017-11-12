@@ -105,8 +105,10 @@ class ERSEnv(gym.Env):
                 self.REMOTE_SOCKET_ADDRESS = ("127.0.0.1", port)
                 if self._send_message("init") == 'ack':
                     return True
+                else:
+                    print('confirmed that port {0} simlulator is busy'.format(port))
             except socket.timeout:
-                ...
+                print('No response from port {0}'.format(port))
             
         self.REMOTE_SOCKET_ADDRESS = None;
         return False
