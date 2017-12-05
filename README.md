@@ -1,4 +1,4 @@
-ERS Simualtors environment and it's gym wrapper.
+Emergency Response System (ERS) simualtor gym environment
 
 To install,
 
@@ -8,10 +8,16 @@ cd gym-ERSLE
 pip install -e .
 ```
 
-Set up environment variable GYM_ERSLE_APP_DIR to point to the simulator app directory. i.e.
+Avaliable environments:
 
-{this repo path}/data/ERS Simulators/windows x86_64 <br />
-{this repo path}/data/ERS Simulators/linux x86_64 <br />
-{this repo path}/data/ERS Simulators/osx x86_64
+discrete action and discrete state space:
+ERSEnv-v3
 
-depending on the platform you are using
+continuous action and discrete state space:
+ERSEnv-ca-v3
+
+discrete action and continuous state space:
+ERSEnv-cs-v3
+
+continuous action and continuous state space:
+ERSEnv-cs-ca-v3

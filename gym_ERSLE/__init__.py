@@ -1,32 +1,34 @@
-from gym_ERSLE.ERSLE_env import ERSEnv
 from gym.envs.registration import register
-import os
-import platform
+from gym_ERSLE.pyERSEnv import ToyScene
 
-app_dir = os.getenv('GYM_ERSLE_APP_DIR')
-if app_dir is None:
-    raise EnvironmentError('Please set GYM_ERSLE_APP_DIR environment variable to point to the directory where ERS simulator executables are placed')
+register(
+    id='pyERSEnv-v3',
+    entry_point='gym_ERSLE:ToyScene',
+    kwargs={'discrete_action':True, 'discrete_state':True},
+    max_episode_steps = 10000000,
+    nondeterministic=False
+)
 
-if platform.system() == 'Windows':
-    extn = '.exe'
-elif platform.system() == 'Darwin':
-    extn = '.app'
-else:
-    extn = ''
+register(
+    id='pyERSEnv-ca-v3',
+    entry_point='gym_ERSLE:ToyScene',
+    kwargs={'discrete_action':False, 'discrete_state':True},
+    max_episode_steps = 10000000,
+    nondeterministic=False
+)
 
-for env_no in range(4):
-    env_name = 'ERSEnv-v{0}'.format(env_no)
-    register(
-        id=env_name,
-        entry_point='gym_ERSLE:ERSEnv',
-        kwargs={'exe_path': os.path.join(app_dir, env_name) + extn, 'image_observation_space': False },
-        max_episode_steps = 10000000,
-        nondeterministic=False
-    )
-    register(
-        id='ERSEnv-image-v{0}'.format(env_no),
-        entry_point='gym_ERSLE:ERSEnv',
-        kwargs={'exe_path': os.path.join(app_dir, env_name) + extn, 'image_observation_space': True },
-        max_episode_steps = 10000000,
-        nondeterministic=False
-    )
+register(
+    id='pyERSEnv-cs-v3',
+    entry_point='gym_ERSLE:ToyScene',
+    kwargs={'discrete_action':True, 'discrete_state':False},
+    max_episode_steps = 10000000,
+    nondeterministic=False
+)
+
+register(
+    id='pyERSEnv-cs-ca-v3',
+    entry_point='gym_ERSLE:ToyScene',
+    kwargs={'discrete_action':False, 'discrete_state':False},
+    max_episode_steps = 10000000,
+    nondeterministic=False
+)
