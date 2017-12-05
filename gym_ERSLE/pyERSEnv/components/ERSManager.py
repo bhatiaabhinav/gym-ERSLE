@@ -54,16 +54,22 @@ class ERSManager(gymGame.GameComponent):
         allocation_fraction = (unNormalizedAllocation * self.AMBULANCE_COUNT) / np.sum(unNormalizedAllocation)
         #print(allocation_fraction)
         allocation = np.round(allocation_fraction)
+        #print(allocation)
         allocated = np.sum(allocation)
         deficit_per_base = allocation_fraction - allocation
         deficit = self.AMBULANCE_COUNT - allocated
+        #print('deficit: {0}'.format(deficit))
         while deficit!=0:
-            increase = (deficit > 0) - (deficit < 0)
+            increase = int(deficit>0)-int(deficit<0)
+            #print('increase: {0}'.format(increase))
             target_base = np.argmax(increase * deficit_per_base)
+            #print('target base: {0}'.format(target_base))
             allocation[target_base] += increase
+            #print('alloction: {0}'.format(allocation))
             allocated += increase
             deficit_per_base[target_base] -= increase
             deficit -= increase
+            #print('deficit: {0}'.format(deficit))
         #print(allocation)
         return allocation
 
