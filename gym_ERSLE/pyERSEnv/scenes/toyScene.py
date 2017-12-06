@@ -20,7 +20,7 @@ class ToyScene(gymGame.Scene):
         if discrete_action:
             self.action_space = spaces.Discrete(self.nact)
         else:
-            self.action_space = spaces.Box(-1, 1, shape=[self.nbases])
+            self.action_space = spaces.Box(0, 1, shape=[self.nbases])
         if self.discrete_state:
             self.observation_space = spaces.Box(0, 1, shape=[self.nbases + 10])
         else:
