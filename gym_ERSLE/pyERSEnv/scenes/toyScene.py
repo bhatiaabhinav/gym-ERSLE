@@ -169,18 +169,18 @@ class ToyScene(gymGame.Scene):
             State = gym_ERSLE.pyERSEnv.Ambulance.State
             for a in self.ersManager.ambulances:
                 if a.state == State.Idle:
-                    ambs_idle += 1
+                    ambs_idle += 1/self.ersManager.AMBULANCE_COUNT
                 elif a.state == State.Relocating:
-                    ambs_relocating += 1
+                    ambs_relocating += 1/self.ersManager.AMBULANCE_COUNT
                 elif a.state == State.InTransitToBase:
-                    ambs_to_base += 1
+                    ambs_to_base += 1/self.ersManager.AMBULANCE_COUNT
                 elif a.state == State.InTransitToHospital:
-                    ambs_to_hospital += 1
+                    ambs_to_hospital += 1/self.ersManager.AMBULANCE_COUNT
                 elif a.state == State.InTransitToRequest:
-                    ambs_to_request += 1
-            self.obs = list(alloc) + \
+                    ambs_to_request += 1/self.ersManager.AMBULANCE_COUNT
+            self.obs = np.array(list(alloc) + \
                         [ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital] + \
-                        [ur, bs, btth, rsitf, mins[0], mins[1]]
+                        [ur, bs, btth, rsitf, mins[0], mins[1]])
         return self.obs
 
     def _getReward(self):
