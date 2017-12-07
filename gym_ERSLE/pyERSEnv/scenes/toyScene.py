@@ -7,7 +7,7 @@ from gym import spaces
 class ToyScene(gymGame.Scene):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, starting_allocation=[1,1,3,9,3,1]):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=False, starting_allocation=[1,1,3,9,3,1]):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -16,6 +16,7 @@ class ToyScene(gymGame.Scene):
         self.nhospitals = 9
         self.fullRewardDeadline = 25
         self.decision_interval = decision_interval
+        self.dynamic = dynamic
         self.starting_allocation = starting_allocation
         self.nact = self.nbases * (self.nbases - 1) + 1
         if discrete_action:
@@ -23,7 +24,7 @@ class ToyScene(gymGame.Scene):
         else:
             self.action_space = spaces.Box(0, 1, shape=[self.nbases])
         if self.discrete_state:
-            self.observation_space = spaces.Box(0, 1, shape=[self.nbases + 10])
+            self.observation_space = spaces.Box(0, 1, shape=[self.nbases + 11])
         else:
             self.observation_space = spaces.Box(0, 255, shape=[gym_ERSLE.pyERSEnv.resolution[1], gym_ERSLE.pyERSEnv.resolution[0], 3])
 
@@ -53,6 +54,14 @@ class ToyScene(gymGame.Scene):
 
         bottomRightRequestsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([4.55, -0.87, 0]))
         bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
+
+        if self.dynamic:
+            bottomLeftRG = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([-3.61, -2.54, 0]))
+            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
+            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
+            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate).peak_time = 0.5
+            bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
+            bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate).peak_time = 0
 
         self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([-2.36, 2.84, 0]))
 
@@ -94,6 +103,7 @@ class ToyScene(gymGame.Scene):
             gym_ERSLE.pyERSEnv.Hospital,
             gym_ERSLE.pyERSEnv.Ambulance,
             gym_ERSLE.pyERSEnv.RequestsPool,
+            gym_ERSLE.pyERSEnv.DynamicRequestRate,
             gym_ERSLE.pyERSEnv.RequestsGenerator,
             gymGame.SimpleSprite,
             gymGame.Camera
@@ -154,7 +164,7 @@ class ToyScene(gymGame.Scene):
             bs = len(self.ersManager.beingServed) / self.requestsPool.maximumRequests
             btth = len(self.ersManager.beingTransportedToHospital) / self.requestsPool.maximumRequests
             rsitf = len(self.ersManager.requestsServedInThisFrame) / self.requestsPool.maximumRequests
-            mins = self.timeKeeper.minutesInCurrentDay / 1440
+            mins = self.timeKeeper.getTimeOfDayAsPointOnCircle()
             ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital = 0, 0, 0, 0, 0
             State = gym_ERSLE.pyERSEnv.Ambulance.State
             for a in self.ersManager.ambulances:
@@ -170,7 +180,7 @@ class ToyScene(gymGame.Scene):
                     ambs_to_request += 1
             self.obs = list(alloc) + \
                         [ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital] + \
-                        [ur, bs, btth, rsitf, mins]
+                        [ur, bs, btth, rsitf, mins[0], mins[1]]
         return self.obs
 
     def _getReward(self):

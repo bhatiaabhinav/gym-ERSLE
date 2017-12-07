@@ -33,11 +33,11 @@ def eval(env_name, episodes=10, render = False):
     env.close()
     stats = {
         'av_reward': np.average(Rs),
-        'fps': f / (tend - tstart),
+        'fps': episodes*1440 / (tend - tstart),
         'eps': episodes/(tend - tstart)
     }
     print(stats)
     print()
 
-eval('pyERSEnv-ca-1440-v3', episodes=5, render=False)
+eval('pyERSEnv-ca-dynamic-1440-v3', episodes=5, render=False)
 #eval('PongNoFrameskip-v4', episodes=20)

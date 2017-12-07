@@ -58,10 +58,13 @@ class RequestsGeneratorPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         rg = gym_ERSLE.pyERSEnv.RequestsGenerator()
+        drr = gym_ERSLE.pyERSEnv.DynamicRequestRate()
+        drr._isEnabled = False
         rg.requestsPerHour = 3
         rg.width = 4
         rg.height = 4
         self.addComponent(rg)
+        self.addComponent(drr)
         self.name = 'Requests Generator'
 
 class RequestPrefab(gymGame.GameObject):
@@ -108,6 +111,6 @@ class CameraPrefab(gymGame.GameObject):
         super().__init__()
         surface = gymGame.Camera.createRenderingSurface(gym_ERSLE.pyERSEnv.resolution)
         cam = gymGame.Camera(renderingSurface= surface, fov=[14, 10])
-        cam.disable()
+        cam._isEnabled = False
         self.addComponent(cam)
         self.name = 'Main Camera'

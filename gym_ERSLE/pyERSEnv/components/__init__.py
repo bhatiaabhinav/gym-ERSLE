@@ -5,5 +5,5 @@ from .ERSManager import ERSManager
 from .timeKeeper import TimeKeeper
 from .Hospital import Hospital
 from .Request import Request
-from .RequestsGenerator import RequestsGenerator
+from .RequestsGenerator import RequestsGenerator, DynamicRequestRate
 from .RequestsPool import RequestsPool
