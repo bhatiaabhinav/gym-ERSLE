@@ -7,7 +7,7 @@ from gym import spaces
 class ToyScene(gymGame.Scene):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, starting_allocation=[1,1,3,9,3,1]):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, starting_allocation=[1,1,3,9,3,1]):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -15,6 +15,7 @@ class ToyScene(gymGame.Scene):
         self.nambs = 18
         self.nhospitals = 9
         self.fullRewardDeadline = 25
+        self.decision_interval = decision_interval
         self.starting_allocation = starting_allocation
         self.nact = self.nbases * (self.nbases - 1) + 1
         if discrete_action:
@@ -104,23 +105,14 @@ class ToyScene(gymGame.Scene):
 
     def _step(self, action):
         # evaluate action here:
-        N = 1
         self._act(action)
-        #if action == 0:
-            # run for N frames:
-        R = 0
-        n = 0
-        for i in range(N):
-            n += 1
+        reward = 0
+        for i in range(self.decision_interval):
             super()._step(action)
-            R += self._getReward()
+            reward += self._getReward()
             if self._getTerminal():
                 break
-        return self._getObservation(), R, self._getTerminal(), self._getInfo()
-        #else:
-        #    return self._getObservation(), 0, False, self._getInfo()
-
-    
+        return self._getObservation(), reward, self._getTerminal(), self._getInfo()
 
     def _render(self, mode='human', close=False):
         if not close:
