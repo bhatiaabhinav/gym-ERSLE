@@ -6,7 +6,7 @@ import time
 
 NOOP = 0
 NOOP = np.array([1,1,3,9,3,1])/18
-TARGET = np.array([4,4,2,0,3,5])/18
+TARGET = np.array([5, 2, 1, 4, 1, 5])/18
 
 def eval(env_name, episodes=10, render = False):
     print('Evaluating ' + env_name)
@@ -39,5 +39,5 @@ def eval(env_name, episodes=10, render = False):
     print(stats)
     print()
 
-eval('pyERSEnv-ca-dynamic-1440-v3', episodes=5, render=False)
+eval('pyERSEnv-im-ca-dynamic-v3', episodes=5, render=False)
 #eval('PongNoFrameskip-v4', episodes=20)

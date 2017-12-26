@@ -22,6 +22,9 @@ class Request(gymGame.GameComponent):
         timeKeeperGO = self.gameObject.scene.findObjectByName('Time Keeper') # type: gymGame.GameObject
         self.timeKeeper = timeKeeperGO.getComponent(ers.TimeKeeper) # type: gym_ERSLE.pyERSEnv.TimeKeeper
 
+        self.sprite_request_old = self.gameObject.getComponent(gymGame.SimpleSprite, tag='sprite_request_old') # type:gymGame.SimpleSprite
+        self.sprite_request_new = self.gameObject.getComponent(gymGame.SimpleSprite, tag='sprite_request_new') # type:gymGame.SimpleSprite
+
     def age(self):
         return self.timeKeeper.minutes - self.timeOfCreation
 
@@ -33,6 +36,8 @@ class Request(gymGame.GameComponent):
         self.timeOfAmbulannceArrival = 0.
         self.timeOfClosure = 0.
         self.servedIn = 0.
+        self.sprite_request_old.disable()
+        self.sprite_request_new.enable()
 
     def create(self):
         self.servicingAmbulance = None
@@ -46,6 +51,8 @@ class Request(gymGame.GameComponent):
     def informAmbulanceAssigned(self, a):
         self.servicingAmbulance = a
         self.timeOfAmnbulanceAllocation = self.timeKeeper.minutes
+        self.sprite_request_new.disable()
+        self.sprite_request_old.enable()
         #print('Request assigned an ambulance')
 
     def informAmbulanceArrived(self):

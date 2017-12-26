@@ -72,10 +72,15 @@ class RequestPrefab(gymGame.GameObject):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=0.25, h=0.25)
         visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.requestOld, w=0.25, h=0.25)
+        visual.tag = 'sprite_request_old'
+        visual2 = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.requestNew, w=0.25, h=0.25)
+        visual2.tag = 'sprite_request_new'
+        visual._isEnabled = False
         r = gym_ERSLE.pyERSEnv.Request()
         self.addComponent(boxCollider)
         self.addComponent(r)
         self.addComponent(visual)
+        self.addComponent(visual2)
         self.name = 'Request'
 
 class RequestsPoolPrefab(gymGame.GameObject):
@@ -103,7 +108,9 @@ class TimeKeeperPrefab(gymGame.GameObject):
         g = gym_ERSLE.pyERSEnv.TimeKeeper()
         g.simulatedKmsPerUnit = 12
         g.simulatedSecondsPerFrame = 60
+        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.clock, w=0.5, h=0.5)
         self.addComponent(g)
+        self.addComponent(visual)
         self.name = 'Time Keeper'
 
 class CameraPrefab(gymGame.GameObject):

@@ -14,9 +14,9 @@ class TimeKeeper(gymGame.GameComponent):
         self.secondsInCurrentDay = 0
         self.minutesInCurrentDay = 0.
         self.hoursInCurrentDay = 0.
-
+        
     def awake(self):
-        pass
+        self.sprite = self.gameObject.getComponent(gymGame.SimpleSprite) # type: gymGame.SimpleSprite
 
     def start(self):
         self.seconds = 0
@@ -24,6 +24,7 @@ class TimeKeeper(gymGame.GameComponent):
         self.secondsInCurrentDay = 0
         self.minutesInCurrentDay = 0.
         self.hoursInCurrentDay = 0.
+        self.sprite.setRotation(0)
 
     def update(self):
         self.seconds += self.simulatedSecondsPerFrame
@@ -31,6 +32,8 @@ class TimeKeeper(gymGame.GameComponent):
         self.secondsInCurrentDay = int(self.seconds % self.SECONDS_IN_A_DAY)
         self.minutesInCurrentDay = float(self.secondsInCurrentDay) / 60
         self.hoursInCurrentDay = float(self.minutesInCurrentDay) / 60
+        if int(self.minutesInCurrentDay) % 15 == 0:
+            self.sprite.setRotation(-self.minutesInCurrentDay*2*math.pi/1440)
 
     def getTimeOfDayAsFractionOfDayPassed(self):
         return self.secondsInCurrentDay / float(self.SECONDS_IN_A_DAY)
