@@ -50,14 +50,14 @@ class ToyScene(gymGame.Scene):
         mainRequestsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab)
         mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).width = 14
         mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).height = 10
-        mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 10
+        mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 1
 
         bottomRightRequestsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([4.55, -0.87, 0]))
-        bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 50
+        bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
 
         if self.dynamic:
             bottomLeftRG = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([-3.61, -2.54, 0]))
-            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 50
+            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
             bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
             bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate).peak_time = 0.5
             bottomRightRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
