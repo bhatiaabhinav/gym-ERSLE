@@ -50,7 +50,7 @@ class ERSManager(gymGame.GameComponent):
     def _normalizedAllocation(self, unNormalizedAllocation):
         unNormalizedAllocation = np.array(unNormalizedAllocation)
         if any(unNormalizedAllocation > 1) or any(unNormalizedAllocation < 0):
-            raise ValueError('Target allocation must be fraction of ambulances on each base. Each item in array should be between 0 and 1')
+            raise ValueError('Target allocation must be fraction of ambulances on each base. Each item in array should be between 0 and 1. Got array {0}'.format(unNormalizedAllocation))
         allocation_fraction = (unNormalizedAllocation * self.AMBULANCE_COUNT) / np.sum(unNormalizedAllocation)
         #print(allocation_fraction)
         allocation = np.round(allocation_fraction)
