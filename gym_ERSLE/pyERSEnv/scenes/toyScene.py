@@ -39,7 +39,7 @@ class ToyScene(gymGame.Scene):
 
         camGO = self.instantiate(gym_ERSLE.pyERSEnv.CameraPrefab) # type: gymGame.GameObject
         self.mainCamera = camGO.getComponent(gymGame.Camera) # type: gymGame.Camera
-        timeKeeperGO = self.instantiate(gym_ERSLE.pyERSEnv.TimeKeeperPrefab, np.array([6.5, 4.5, 0]))
+        timeKeeperGO = self.instantiate(gym_ERSLE.pyERSEnv.TimeKeeperPrefab, np.array([6, 4, 0]))
         self.timeKeeper = timeKeeperGO.getComponent(gym_ERSLE.pyERSEnv.TimeKeeper) # type: gym_ERSLE.pyERSEnv.TimeKeeper
         ersManagerGO = self.instantiate(gym_ERSLE.pyERSEnv.ERSManagerPrefab) # type: gymGame.GameObject
         self.ersManager = ersManagerGO.getComponent(gym_ERSLE.pyERSEnv.ERSManager) # gym_ERSLE.pyERSEnv: ers.ERSManager

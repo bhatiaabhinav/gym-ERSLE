@@ -36,14 +36,17 @@ class HospitalPrefab(gymGame.GameObject):
 class BasePrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
-        boxCollider = gymGame.BoxCollider2D(w=0.6, h=0.6)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base, w=0.6, h=0.6, static=True)
+        boxCollider = gymGame.BoxCollider2D(w=1, h=1)
+        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base, w=1, h=1, static=True)
+        visual_level = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base_level, w=1, h=1)
+        visual_level.tag = 'level'
         b = gym_ERSLE.pyERSEnv.Base()
         b.initialAllocationPercentage = 100
         b.spawnPointOffset = np.array([0.25, 0, 0])
         self.addComponent(boxCollider)
         self.addComponent(b)
         self.addComponent(visual)
+        self.addComponent(visual_level)
         self.name = 'Base'
 
 class BasesInitializerPrefab(gymGame.GameObject):
@@ -108,7 +111,7 @@ class TimeKeeperPrefab(gymGame.GameObject):
         g = gym_ERSLE.pyERSEnv.TimeKeeper()
         g.simulatedKmsPerUnit = 12
         g.simulatedSecondsPerFrame = 60
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.clock, w=0.5, h=0.5)
+        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.clock, w=1, h=1)
         self.addComponent(g)
         self.addComponent(visual)
         self.name = 'Time Keeper'

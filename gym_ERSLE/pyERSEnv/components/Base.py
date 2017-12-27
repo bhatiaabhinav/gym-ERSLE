@@ -15,6 +15,8 @@ class Base(gymGame.GameComponent):
     def awake(self):
         ersManagerGO = self.gameObject.scene.findObjectByName('ERS Manager') # type: gymGame.GameObject
         self.ersManager = ersManagerGO.getComponent(gym_ERSLE.pyERSEnv.ERSManager) # type: gym_ERSLE.pyERSEnv.ERSManager
+        self.level_sprite = self.gameObject.getComponent(gymGame.SimpleSprite, tag='level') # type: gymGame.SimpleSprite
+        self.max_size = self.level_sprite.size
 
     def register(self):
         self.ID = self.ersManager.registerBase(self)
@@ -25,3 +27,7 @@ class Base(gymGame.GameComponent):
 
     def removeAmbulance(self, a):
         self.allocatedAmbulances.remove(a)
+
+    def update(self):
+        fraction = len(self.allocatedAmbulances)/self.ersManager.AMBULANCE_COUNT
+        self.level_sprite.setSize([fraction * self.max_size[0], fraction * self.max_size[1]])
