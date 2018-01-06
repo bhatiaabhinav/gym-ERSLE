@@ -8,7 +8,7 @@ class RequestsPool(gymGame.GameComponent):
     def __init__(self):
         super().__init__()
         self.requestPrefab = None
-        self.maximumRequests = 100
+        self.maximumRequests = 30
         self.requests = [] # type: List[gym_ERSLE.pyERSEnv.Request]
         self.stashPoint = np.array([-100, -100, 0])
         self._nextPooledRequestID = 0

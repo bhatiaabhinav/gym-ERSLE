@@ -1,17 +1,23 @@
+import argparse
+import ast
 import gym_ERSLE
 import gym
 import numpy as np
+import sys
 import typing
 import time
 
 NOOP = 0
-NOOP = np.array([1,1,3,9,3,1])/18
-TARGET = np.array([5, 2, 1, 4, 1, 5])/18
+# NOOP = np.array([1,1,3,9,3,1])/18
+NOOP = np.array([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]) / 24
+# TARGET = np.array([5, 2, 1, 4, 1, 5])/18
+TARGET = np.array([4, 4, 1, 1, 2, 1, 2, 3, 2, 3, 1, 0]) / 24
 
-def eval(env_name, episodes=10, render = False):
-    print('Evaluating ' + env_name)
-    env = gym.make(env_name) # type: gym.Env
-    env.seed(0)
+
+def eval(env_name, episodes=10, render=False, seed=42, action=0):
+    print('Evaluating {0} for {1} episodes. Seed={2}'.format(env_name, episodes, seed))
+    env = gym.make(env_name)  # type: gym.Env
+    env.seed(seed)
     tstart = time.time()
     Rs = []
     f = 0
@@ -20,24 +26,38 @@ def eval(env_name, episodes=10, render = False):
         R = 0
         obs = env.reset()
         f += 1
-        if render: env.render()
+        if render:
+            env.render()
         while not d:
-            obs, r, d, _ = env.step(TARGET)
+            obs, r, d, _ = env.step(action)
             f += 1
-            if render: env.render()
+            if render:
+                env.render()
+            # time.sleep(1/60)
             R += r
-            #print(obs)
+            # print(obs)
         Rs.append(R)
         print(R)
     tend = time.time()
     env.close()
     stats = {
         'av_reward': np.average(Rs),
-        'fps': episodes*1440 / (tend - tstart),
-        'eps': episodes/(tend - tstart)
+        'fps': episodes * 1440 / (tend - tstart),
+        'eps': episodes / (tend - tstart)
     }
     print(stats)
     print()
 
-eval('pyERSEnv-im-ca-dynamic-v3', episodes=5, render=False)
-#eval('PongNoFrameskip-v4', episodes=20)
+
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--env', help='environment ID', default='pyERSEnv-ca-dynamic-1440-v4')
+parser.add_argument('--seed', help='initial env seed for testing', default=42, type=int)
+parser.add_argument('--episodes', help='Test for how many episodes', default=5, type=int)
+parser.add_argument('--render', help='render?', default=False, type=bool)
+parser.add_argument('--alloc', help='static allocaton to test', default="[2,2,2,2,2,2,2,2,2,2,2,2]")
+args = parser.parse_args()
+alloc = np.array(ast.literal_eval(args.alloc))
+print('alloc={0}'.format(alloc))
+alloc = alloc / np.sum(alloc)
+eval(args.env, episodes=args.episodes, render=args.render, seed=args.seed, action=alloc)
+# eval('PongNoFrameskip-v4', episodes=20)

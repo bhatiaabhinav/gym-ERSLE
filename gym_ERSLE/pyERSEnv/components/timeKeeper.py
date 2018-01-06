@@ -3,6 +3,7 @@ import gym_ERSLE.pyERSEnv
 import random
 import math
 
+
 class TimeKeeper(gymGame.GameComponent):
     def __init__(self):
         super().__init__()
@@ -14,9 +15,10 @@ class TimeKeeper(gymGame.GameComponent):
         self.secondsInCurrentDay = 0
         self.minutesInCurrentDay = 0.
         self.hoursInCurrentDay = 0.
-        
+
     def awake(self):
-        self.sprite = self.gameObject.getComponent(gymGame.SimpleSprite) # type: gymGame.SimpleSprite
+        self.sprite = self.gameObject.getComponent(
+            gymGame.SimpleSprite)  # type: gymGame.SimpleSprite
 
     def start(self):
         self.seconds = 0
@@ -33,7 +35,7 @@ class TimeKeeper(gymGame.GameComponent):
         self.minutesInCurrentDay = float(self.secondsInCurrentDay) / 60
         self.hoursInCurrentDay = float(self.minutesInCurrentDay) / 60
         if int(self.minutesInCurrentDay) % 15 == 0:
-            self.sprite.setRotation(-self.minutesInCurrentDay*2*math.pi/1440)
+            self.sprite.setRotation(-self.minutesInCurrentDay * 2 * math.pi / 1440)
 
     def getTimeOfDayAsFractionOfDayPassed(self):
         return self.secondsInCurrentDay / float(self.SECONDS_IN_A_DAY)

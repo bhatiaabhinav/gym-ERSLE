@@ -6,6 +6,7 @@ import gym_ERSLE.pyERSEnv.sprites
 
 DIR_NAME = osp.dirname(__file__)
 
+
 class AmbulancePrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
@@ -13,7 +14,7 @@ class AmbulancePrefab(gymGame.GameObject):
         visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.ambulance, w=0.3, h=0.3)
         amb = gym_ERSLE.pyERSEnv.Ambulance()
         amb.state = gym_ERSLE.pyERSEnv.Ambulance.State.Idle
-        amb.drivingSpeed = 60.0
+        amb.drivingSpeed = 30.0
         amb.kmsPerLitre = 10.0
         amb.minutesAtRequestSite = 0
         amb.minutesAtHospital = 0
@@ -22,23 +23,26 @@ class AmbulancePrefab(gymGame.GameObject):
         self.addComponent(visual)
         self.name = 'Ambulance'
 
+
 class HospitalPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=0.4, h=0.4)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.hospital, w=0.4, h=0.4, static=True)
+        visual = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.hospital, w=0.4, h=0.4, static=True)
         h = gym_ERSLE.pyERSEnv.Hospital()
         self.addComponent(boxCollider)
         self.addComponent(h)
         self.addComponent(visual)
         self.name = 'Hospital'
 
+
 class BasePrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=1, h=1)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base, w=1, h=1, static=True)
-        visual_level = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base_level, w=1, h=1)
+        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base, w=0.5, h=0.5, static=True)
+        visual_level = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base_level, w=0.5, h=0.5)
         visual_level.tag = 'level'
         b = gym_ERSLE.pyERSEnv.Base()
         b.initialAllocationPercentage = 100
@@ -49,6 +53,7 @@ class BasePrefab(gymGame.GameObject):
         self.addComponent(visual_level)
         self.name = 'Base'
 
+
 class BasesInitializerPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
@@ -56,6 +61,7 @@ class BasesInitializerPrefab(gymGame.GameObject):
         bi.bases = []
         self.addComponent(bi)
         self.name = 'Bases Initializer'
+
 
 class RequestsGeneratorPrefab(gymGame.GameObject):
     def __init__(self):
@@ -69,6 +75,7 @@ class RequestsGeneratorPrefab(gymGame.GameObject):
         self.addComponent(rg)
         self.addComponent(drr)
         self.name = 'Requests Generator'
+
 
 class RequestPrefab(gymGame.GameObject):
     def __init__(self):
@@ -86,6 +93,7 @@ class RequestPrefab(gymGame.GameObject):
         self.addComponent(visual2)
         self.name = 'Request'
 
+
 class RequestsPoolPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
@@ -96,6 +104,7 @@ class RequestsPoolPrefab(gymGame.GameObject):
         self.addComponent(rp)
         self.name = 'Requests Pool'
 
+
 class ERSManagerPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
@@ -105,22 +114,23 @@ class ERSManagerPrefab(gymGame.GameObject):
         self.addComponent(ersm)
         self.name = 'ERS Manager'
 
+
 class TimeKeeperPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         g = gym_ERSLE.pyERSEnv.TimeKeeper()
-        g.simulatedKmsPerUnit = 12
+        g.simulatedKmsPerUnit = 3
         g.simulatedSecondsPerFrame = 60
         visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.clock, w=1, h=1)
         self.addComponent(g)
         self.addComponent(visual)
         self.name = 'Time Keeper'
 
+
 class CameraPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
-        surface = gymGame.Camera.createRenderingSurface(gym_ERSLE.pyERSEnv.resolution)
-        cam = gymGame.Camera(renderingSurface= surface, fov=[14, 10])
-        cam._isEnabled = False
+        surface = gymGame.Camera.createRenderingSurface([400, 300])
+        cam = gymGame.Camera(renderingSurface=surface, fov=[14, 10])
         self.addComponent(cam)
         self.name = 'Main Camera'
