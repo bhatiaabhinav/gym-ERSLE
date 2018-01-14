@@ -68,12 +68,15 @@ class RequestsGeneratorPrefab(gymGame.GameObject):
         super().__init__()
         rg = gym_ERSLE.pyERSEnv.RequestsGenerator()
         drr = gym_ERSLE.pyERSEnv.DynamicRequestRate()
+        blip = gym_ERSLE.pyERSEnv.Blip()
         drr._isEnabled = False
+        blip._isEnabled = False
         rg.requestsPerHour = 3
         rg.width = 4
         rg.height = 4
         self.addComponent(rg)
         self.addComponent(drr)
+        self.addComponent(blip)
         self.name = 'Requests Generator'
 
 
@@ -98,7 +101,7 @@ class RequestsPoolPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         rp = gym_ERSLE.pyERSEnv.RequestsPool()
-        rp.maximumRequests = 30
+        rp.maximumRequests = 50
         rp.stashPoint = np.array([-100, -100, 0])
         rp.requestPrefab = RequestPrefab
         self.addComponent(rp)

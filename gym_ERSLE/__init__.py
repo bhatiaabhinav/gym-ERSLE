@@ -12,17 +12,19 @@ for version in ['v3', 'v4']:
         for ca in [False, True]:
             for im in [False, True]:
                 for dynamic in [False, True]:
-                    register(
-                        id='pyERSEnv{0}{1}{2}{3}-{4}'.format(
-                            '-im' if im else '',
-                            '-ca' if ca else '',
-                            '-dynamic' if dynamic else '',
-                            '-{0}'.format(decision_interval) if decision_interval > 1 else '',
-                            version
-                        ),
-                        entry_point=version_to_scene_map[version],
-                        kwargs={'discrete_action': not ca, 'discrete_state': not im,
-                                'decision_interval': decision_interval, 'dynamic': dynamic},
-                        max_episode_steps=10000000,
-                        nondeterministic=False
-                    )
+                    for blips in [False, True]:
+                        register(
+                            id='pyERSEnv{0}{1}{2}{3}{4}-{5}'.format(
+                                '-im' if im else '',
+                                '-ca' if ca else '',
+                                '-dynamic' if dynamic else '',
+                                '-blips' if blips else '',
+                                '-{0}'.format(decision_interval) if decision_interval > 1 else '',
+                                version
+                            ),
+                            entry_point=version_to_scene_map[version],
+                            kwargs={'discrete_action': not ca, 'discrete_state': not im,
+                                    'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips},
+                            max_episode_steps=10000000,
+                            nondeterministic=False
+                        )

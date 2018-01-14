@@ -7,7 +7,7 @@ from gym import spaces
 class Scene4(gymGame.Scene):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=False, starting_allocation=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=False, random_blips=True, starting_allocation=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -17,6 +17,7 @@ class Scene4(gymGame.Scene):
         self.fullRewardDeadline = 10
         self.decision_interval = decision_interval
         self.dynamic = dynamic
+        self.random_blips = random_blips
         self.starting_allocation = starting_allocation
         self.nact = self.nbases * (self.nbases - 1) + 1
         if discrete_action:
@@ -57,6 +58,16 @@ class Scene4(gymGame.Scene):
         mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).width = 14
         mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).height = 10
         mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 2
+
+        if self.random_blips:
+            blipsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, position=np.array([
+                                              12 * self.random.random() - 6, 8 * self.random.random() - 4, 0]))
+            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).width = 1
+            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).height = 1
+            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 0
+            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip)._isEnabled = True
+            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time = self.random.random()
+            # print(blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time)
 
         bottomRightRequestsGenerator = self.instantiate(
             gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([4.55, -0.87, 0]))
