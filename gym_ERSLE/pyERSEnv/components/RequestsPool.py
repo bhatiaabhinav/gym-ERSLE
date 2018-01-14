@@ -28,7 +28,7 @@ class RequestsPool(gymGame.GameComponent):
     def createNew(self, position):
         r = self.requests[self._nextPooledRequestID]
         if r.gameObject.isActive:
-            print("No more requests can be created right now")
+            #print("No more requests can be created right now")
             return None
         self._nextPooledRequestID = (self._nextPooledRequestID + 1) % self.maximumRequests
         r.gameObject.setPosition(position)
