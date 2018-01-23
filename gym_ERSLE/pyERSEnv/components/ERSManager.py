@@ -3,23 +3,26 @@ import gymGame
 import numpy as np
 from typing import List, Set
 
+
 class ERSManager(gymGame.GameComponent):
 
     def __init__(self):
         super().__init__()
         self.AMBULANCE_COUNT = 18
-        self.bases = [] # type: List[gym_ERSLE.pyERSEnv.Base]
-        self.ambulances = [] # type: List[gym_ERSLE.pyERSEnv.Ambulance]
-        self.hospitals = [] # type: List[gym_ERSLE.pyERSEnv.Hospital]
-        self.unservedRequests = [] # type: List[gym_ERSLE.pyERSEnv.Request]
-        self.beingServed = set() # type: Set[gym_ERSLE.pyERSEnv.Request]
-        self.beingTransportedToHospital = set() # type: Set[gym_ERSLE.pyERSEnv.Request]
+        self.bases = []  # type: List[gym_ERSLE.pyERSEnv.Base]
+        self.ambulances = []  # type: List[gym_ERSLE.pyERSEnv.Ambulance]
+        self.hospitals = []  # type: List[gym_ERSLE.pyERSEnv.Hospital]
+        self.unservedRequests = []  # type: List[gym_ERSLE.pyERSEnv.Request]
+        self.beingServed = set()  # type: Set[gym_ERSLE.pyERSEnv.Request]
+        # type: Set[gym_ERSLE.pyERSEnv.Request]
+        self.beingTransportedToHospital = set()
         self.ambulancePrefab = None
-        self.requestsServedInThisFrame = [] # type: List[gym_ERSLE.pyERSEnv.Request]
+        self.requestsServedInThisFrame = []  # type: List[gym_ERSLE.pyERSEnv.Request]
+        self.requestsReceivedInThisFrame = []  # type: List[gym_ERSLE.pyERSEnv.Request]
 
     def awake(self):
         for i in range(self.AMBULANCE_COUNT):
-           self.gameObject.scene.instantiate(self.ambulancePrefab)
+            self.gameObject.scene.instantiate(self.ambulancePrefab)
 
     def registerBase(self, b):
         self.bases.append(b)
@@ -35,6 +38,7 @@ class ERSManager(gymGame.GameComponent):
 
     def registerRequest(self, r):
         self.unservedRequests.append(r)
+        self.requestsReceivedInThisFrame.append(r)
 
     def markAsServed(self, r):
         r.informAmbulanceArrived()
@@ -50,17 +54,19 @@ class ERSManager(gymGame.GameComponent):
     def _normalizedAllocation(self, unNormalizedAllocation):
         unNormalizedAllocation = np.array(unNormalizedAllocation)
         if any(unNormalizedAllocation > 1) or any(unNormalizedAllocation < 0):
-            raise ValueError('Target allocation must be fraction of ambulances on each base. Each item in array should be between 0 and 1. Got array {0}'.format(unNormalizedAllocation))
-        allocation_fraction = (unNormalizedAllocation * self.AMBULANCE_COUNT) / np.sum(unNormalizedAllocation)
-        #print(allocation_fraction)
+            raise ValueError('Target allocation must be fraction of ambulances on each base. Each item in array should be between 0 and 1. Got array {0}'.format(
+                unNormalizedAllocation))
+        allocation_fraction = (
+            unNormalizedAllocation * self.AMBULANCE_COUNT) / np.sum(unNormalizedAllocation)
+        # print(allocation_fraction)
         allocation = np.round(allocation_fraction)
-        #print(allocation)
+        # print(allocation)
         allocated = np.sum(allocation)
         deficit_per_base = allocation_fraction - allocation
         deficit = self.AMBULANCE_COUNT - allocated
         #print('deficit: {0}'.format(deficit))
-        while deficit!=0:
-            increase = int(deficit>0)-int(deficit<0)
+        while deficit != 0:
+            increase = int(deficit > 0) - int(deficit < 0)
             #print('increase: {0}'.format(increase))
             target_base = np.argmax(increase * deficit_per_base)
             #print('target base: {0}'.format(target_base))
@@ -70,19 +76,23 @@ class ERSManager(gymGame.GameComponent):
             deficit_per_base[target_base] -= increase
             deficit -= increase
             #print('deficit: {0}'.format(deficit))
-        #print(allocation)
+        # print(allocation)
         return allocation
 
     def causeAllocation(self, target_allocation):
         target_allocation = self._normalizedAllocation(target_allocation)
         if sum(target_allocation) != self.AMBULANCE_COUNT:
-            raise ValueError('sum of target_allocation should be same as num_ambs')
+            raise ValueError(
+                'sum of target_allocation should be same as num_ambs')
         current_allocation = [len(b.allocatedAmbulances) for b in self.bases]
-        change = (np.asarray(target_allocation) - np.asarray(current_allocation)).tolist()
+        change = (np.asarray(target_allocation) -
+                  np.asarray(current_allocation)).tolist()
         assert(sum(change) == 0)
-        change = [{'base': i, 'change': change[i]} for i in range(len(self.bases))]
+        change = [{'base': i, 'change': change[i]}
+                  for i in range(len(self.bases))]
         largest_sources = sorted(change, key=lambda item: item['change'])
-        largest_gainers = sorted(change, key=lambda item: item['change'], reverse=True)
+        largest_gainers = sorted(
+            change, key=lambda item: item['change'], reverse=True)
         ls_index = 0
         lg_index = 0
         while max(ls_index, lg_index) < len(self.bases):
@@ -102,7 +112,8 @@ class ERSManager(gymGame.GameComponent):
     def allocateAmbulance(self, b, a):
         if a.currentBase is None:
             # the ambulance is being allocated for the first time. Should be teleported to its first base :p
-            a.gameObject.setPosition(b.gameObject.position + b.spawnPointOffset)
+            a.gameObject.setPosition(
+                b.gameObject.position + b.spawnPointOffset)
             a.state = gym_ERSLE.pyERSEnv.Ambulance.State.Idle
         if a.currentBase is not None and a.currentBase != b:
             a.currentBase.removeAmbulance(a)
@@ -114,7 +125,8 @@ class ERSManager(gymGame.GameComponent):
         sum = np.sum([b.initialAllocationPercentage for b in self.bases])
         ambulanceIndex = 0
         for b in self.bases:
-            allocateToThisBase = (b.initialAllocationPercentage * self.AMBULANCE_COUNT) / sum
+            allocateToThisBase = (
+                b.initialAllocationPercentage * self.AMBULANCE_COUNT) / sum
             allocated += allocateToThisBase
             while ambulanceIndex < allocated:
                 self.allocateAmbulance(b, self.ambulances[ambulanceIndex])
@@ -123,27 +135,33 @@ class ERSManager(gymGame.GameComponent):
         baseIndex = 0
         if allocated < self.AMBULANCE_COUNT:
             while ambulanceIndex < self.AMBULANCE_COUNT:
-                self.allocateAmbulance(self.bases[baseIndex], self.ambulances[ambulanceIndex])
+                self.allocateAmbulance(
+                    self.bases[baseIndex], self.ambulances[ambulanceIndex])
                 baseIndex += 1
                 ambulanceIndex += 1
 
     def relocateAnAmbulance(self, frm, to):
-        #print('Relocating')
+        # print('Relocating')
         if frm != to:
-            eligibleAmbs = list(filter(lambda a: not a.isBusy() and not a.relocationOrder, frm.allocatedAmbulances))
+            eligibleAmbs = list(filter(lambda a: not a.isBusy(
+            ) and not a.relocationOrder, frm.allocatedAmbulances))
             if len(eligibleAmbs) == 0:
-                eligibleAmbs = list(filter(lambda a: a.isBusy() and not a.relocationOrder and a.state != gym_ERSLE.pyERSEnv.Ambulance.State.Relocating, frm.allocatedAmbulances))
+                eligibleAmbs = list(filter(lambda a: a.isBusy() and not a.relocationOrder and a.state !=
+                                           gym_ERSLE.pyERSEnv.Ambulance.State.Relocating, frm.allocatedAmbulances))
             if len(eligibleAmbs) > 0:
-                distances = [np.linalg.norm(a.gameObject.position - to.gameObject.position) for a in eligibleAmbs]
+                distances = [np.linalg.norm(
+                    a.gameObject.position - to.gameObject.position) for a in eligibleAmbs]
                 amb = eligibleAmbs[np.argmin(distances)]
                 self.allocateAmbulance(to, amb)
 
     def serveRequests(self):
         while len(self.unservedRequests) > 0:
             first = self.unservedRequests[0]
-            nonBusyAmbs = list(filter(lambda a: not a.isBusy(), self.ambulances))
+            nonBusyAmbs = list(
+                filter(lambda a: not a.isBusy(), self.ambulances))
             if len(nonBusyAmbs) > 0:
-                ambsDistances = [np.linalg.norm(a.gameObject.position - first.gameObject.position) for a in nonBusyAmbs]
+                ambsDistances = [np.linalg.norm(
+                    a.gameObject.position - first.gameObject.position) for a in nonBusyAmbs]
                 bestAmb = nonBusyAmbs[np.argmin(ambsDistances)]
                 bestAmb.dispatch(first)
                 first.informAmbulanceAssigned(bestAmb)
@@ -154,4 +172,5 @@ class ERSManager(gymGame.GameComponent):
 
     def update(self):
         self.requestsServedInThisFrame.clear()
+        self.requestsReceivedInThisFrame.clear()
         self.serveRequests()

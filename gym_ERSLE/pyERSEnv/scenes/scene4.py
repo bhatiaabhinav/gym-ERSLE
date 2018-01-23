@@ -25,9 +25,11 @@ class Scene4(gymGame.Scene):
         else:
             self.action_space = spaces.Box(0, 1, shape=[self.nbases])
         if self.discrete_state:
-            self.observation_space = spaces.Box(0, 1, shape=self._get_observation_shape())
+            self.observation_space = spaces.Box(
+                0, 1, shape=self._get_observation_shape())
         else:
-            self.observation_space = spaces.Box(0, 255, shape=self._get_observation_shape())
+            self.observation_space = spaces.Box(
+                0, 255, shape=self._get_observation_shape())
 
         self.viewer = None  # type: gym.envs.classic_control.rendering.SimpleImageViewer
 
@@ -38,9 +40,12 @@ class Scene4(gymGame.Scene):
         self._map_bounds = [[-7, -5], [7, 5]]
         self.fov = [14, 10]
 
-        camGO = self.instantiate(gym_ERSLE.pyERSEnv.CameraPrefab)  # type: gymGame.GameObject
-        self.mainCamera = camGO.getComponent(gymGame.Camera)  # type: gymGame.Camera
-        timeKeeperGO = self.instantiate(gym_ERSLE.pyERSEnv.TimeKeeperPrefab, np.array([6, 4, 0]))
+        # type: gymGame.GameObject
+        camGO = self.instantiate(gym_ERSLE.pyERSEnv.CameraPrefab)
+        self.mainCamera = camGO.getComponent(
+            gymGame.Camera)  # type: gymGame.Camera
+        timeKeeperGO = self.instantiate(
+            gym_ERSLE.pyERSEnv.TimeKeeperPrefab, np.array([6, 4, 0]))
         self.timeKeeper = timeKeeperGO.getComponent(
             gym_ERSLE.pyERSEnv.TimeKeeper)  # type: gym_ERSLE.pyERSEnv.TimeKeeper
         ersManagerGO = self.instantiate(
@@ -54,19 +59,28 @@ class Scene4(gymGame.Scene):
         self.requestsPool = requestsPoolGO.getComponent(
             gym_ERSLE.pyERSEnv.RequestsPool)  # type: gym_ERSLE.pyERSEnv.RequestsPool
 
-        mainRequestsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab)
-        mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).width = 14
-        mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).height = 10
-        mainRequestsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 2
+        mainRequestsGenerator = self.instantiate(
+            gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab)
+        mainRequestsGenerator.getComponent(
+            gym_ERSLE.pyERSEnv.RequestsGenerator).width = 14
+        mainRequestsGenerator.getComponent(
+            gym_ERSLE.pyERSEnv.RequestsGenerator).height = 10
+        mainRequestsGenerator.getComponent(
+            gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 2
 
         if self.random_blips:
             blipsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, position=np.array([
                                               12 * self.random.random() - 6, 8 * self.random.random() - 4, 0]))
-            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).width = 1
-            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).height = 1
-            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 0
-            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip)._isEnabled = True
-            blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time = self.random.random()
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).width = 1
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).height = 1
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 0
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.Blip)._isEnabled = True
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.Blip).peak_time = self.random.random()
             # print(blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time)
 
         bottomRightRequestsGenerator = self.instantiate(
@@ -77,9 +91,12 @@ class Scene4(gymGame.Scene):
         if self.dynamic:
             bottomLeftRG = self.instantiate(
                 gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([-3.61, -2.54, 0]))
-            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
-            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
-            bottomLeftRG.getComponent(gym_ERSLE.pyERSEnv.DynamicRequestRate).peak_time = 0.5
+            bottomLeftRG.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
+            bottomLeftRG.getComponent(
+                gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
+            bottomLeftRG.getComponent(
+                gym_ERSLE.pyERSEnv.DynamicRequestRate).peak_time = 0.5
             bottomRightRequestsGenerator.getComponent(
                 gym_ERSLE.pyERSEnv.DynamicRequestRate)._isEnabled = True
             bottomRightRequestsGenerator.getComponent(
@@ -90,7 +107,8 @@ class Scene4(gymGame.Scene):
         topLeftRequestsGenerator.getComponent(
             gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 5
 
-        basesInitializer = self.instantiate(gym_ERSLE.pyERSEnv.BasesInitializerPrefab)
+        basesInitializer = self.instantiate(
+            gym_ERSLE.pyERSEnv.BasesInitializerPrefab)
         bases = []
         basePositions = [
             [-4.2, 2.5, 0],
@@ -112,7 +130,8 @@ class Scene4(gymGame.Scene):
                 gym_ERSLE.pyERSEnv.BasePrefab, np.array(basePositions[i])))
             bases[i].getComponent(
                 gym_ERSLE.pyERSEnv.Base).initialAllocationPercentage = initialAllocation[i]
-        basesInitializer.getComponent(gym_ERSLE.pyERSEnv.BasesInitializer).bases = bases
+        basesInitializer.getComponent(
+            gym_ERSLE.pyERSEnv.BasesInitializer).bases = bases
 
         hospitalPositions = [
             [-4.67, 3, 0],
@@ -137,7 +156,8 @@ class Scene4(gymGame.Scene):
             [4.67, -3, 0]
         ]
         for i in range(self.nhospitals):
-            self.instantiate(gym_ERSLE.pyERSEnv.HospitalPrefab, np.array(hospitalPositions[i]))
+            self.instantiate(gym_ERSLE.pyERSEnv.HospitalPrefab,
+                             np.array(hospitalPositions[i]))
 
         gymGame.set_execution_order([
             gym_ERSLE.pyERSEnv.TimeKeeper,
@@ -161,12 +181,24 @@ class Scene4(gymGame.Scene):
         # evaluate action here:
         self._act(action)
         reward = 0
+        request_heat_map = None
+        steps = 0
         for i in range(self.decision_interval):
             super()._step(action)
             reward += self._getReward()
+            obs = self._getObservation()
+            steps += 1
+            if request_heat_map is None:
+                request_heat_map = obs[0:self.nbases]
+            else:
+                if self.discrete_state:
+                    # add up the request heat map:
+                    request_heat_map = request_heat_map + obs[0:self.nbases]
             if self._getTerminal():
                 break
-        return self._getObservation(), reward, self._getTerminal(), self._getInfo()
+        request_heat_map = request_heat_map / steps
+        obs[0:self.nbases] = request_heat_map
+        return obs, reward, self._getTerminal(), self._getInfo()
 
     def _render(self, mode='human', close=False):
         if not close:
@@ -247,14 +279,12 @@ class Scene4(gymGame.Scene):
             ], axis=2)
 
         else:
-            # alloc = np.array([len(b.allocatedAmbulances)
-            #                   for b in self.ersManager.bases]) / self.ersManager.AMBULANCE_COUNT
-            # ur_heat_map = self._to_heat_map_by_base_zone(
-            #     [r.gameObject.position for r in self.ersManager.unservedRequests]) / self.requestsPool.maximumRequests
-            # bs = self._to_heat_map_by_base_zone([r.gameObject.position for r in self.ersManager.beingServed]) / self.requestsPool.maximumRequests
-            # btth = len(self.ersManager.beingTransportedToHospital) / self.requestsPool.maximumRequests
-            # rsitf = len(self.ersManager.requestsServedInThisFrame) / self.requestsPool.maximumRequests
+
             mins = self.timeKeeper.getTimeOfDayAsPointOnCircle()
+            requests_heat_map = self._to_heat_map_by_base_zone(
+                [r.gameObject.position for r in self.ersManager.requestsReceivedInThisFrame], self.requestsPool.maximumRequests)
+            alloc_heat_map = self._to_heat_map_by_base_zone(
+                [a.currentBase.gameObject.position for a in self.ersManager.ambulances], self.ersManager.AMBULANCE_COUNT)
             # ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital = [], [], [], [], []
             # State = gym_ERSLE.pyERSEnv.Ambulance.State
             # for a in self.ersManager.ambulances:
@@ -277,11 +307,8 @@ class Scene4(gymGame.Scene):
             #     self._to_heat_map_by_base_zone(
             #         [a.gameObject.position for a in ambs_to_hospital]) / self.ersManager.AMBULANCE_COUNT
             self.obs = np.array(
-                # list(alloc) + \
-                # list(ur_heat_map) + \
-                # list(ambs_idle_heat_map) + \
-                # list(ambs_busy_heat_map) + \
-                # list(ambs_relocating_heat_map) + \
+                list(requests_heat_map) +
+                list(alloc_heat_map) +
                 [mins[0], mins[1]])
         assert list(self.obs.shape) == self._get_observation_shape(), print(
             '{0}\n{1}'.format(self.obs.shape, self._get_observation_shape()))
@@ -291,15 +318,16 @@ class Scene4(gymGame.Scene):
         if not self.discrete_state:
             return [21, 21, 7]
         else:
-            return [2]
+            return [2 * self.nbases + 2]
 
-    def _to_heat_map_by_base_zone(self, positions):
+    def _to_heat_map_by_base_zone(self, positions, max_heat):
         heat_map = np.array([0] * len(self.ersManager.bases))
         for p in positions:
             baseDistances = [np.linalg.norm(p - b.gameObject.position)
                              for b in self.ersManager.bases]
             closestBase = np.argmin(baseDistances)
             heat_map[closestBase] += 1
+        heat_map = heat_map / max_heat
         return heat_map
 
     def _to_heat_map(self, positions, max_heat):
