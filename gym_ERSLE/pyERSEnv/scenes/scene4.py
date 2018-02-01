@@ -280,7 +280,7 @@ class Scene4(gymGame.Scene):
 
         else:
 
-            mins = self.timeKeeper.getTimeOfDayAsPointOnCircle()
+            mins = self.timeKeeper.getTimeOfDayAsFractionOfDayPassed()
             requests_heat_map = self._to_heat_map_by_base_zone(
                 [r.gameObject.position for r in self.ersManager.requestsReceivedInThisFrame], self.requestsPool.maximumRequests)
             alloc_heat_map = self._to_heat_map_by_base_zone(
@@ -309,7 +309,7 @@ class Scene4(gymGame.Scene):
             self.obs = np.array(
                 list(requests_heat_map) +
                 list(alloc_heat_map) +
-                [mins[0], mins[1]])
+                [mins])
         assert list(self.obs.shape) == self._get_observation_shape(), print(
             '{0}\n{1}'.format(self.obs.shape, self._get_observation_shape()))
         return self.obs
@@ -318,7 +318,7 @@ class Scene4(gymGame.Scene):
         if not self.discrete_state:
             return [21, 21, 7]
         else:
-            return [2 * self.nbases + 2]
+            return [2 * self.nbases + 1]
 
     def _to_heat_map_by_base_zone(self, positions, max_heat):
         heat_map = np.array([0] * len(self.ersManager.bases))
