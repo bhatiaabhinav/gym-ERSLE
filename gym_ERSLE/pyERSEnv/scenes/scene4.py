@@ -5,7 +5,7 @@ from gym import spaces
 
 
 class Scene4(gymGame.Scene):
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['human', 'rgb']}
 
     def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=False, random_blips=True, starting_allocation=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]):
         super().__init__()
@@ -175,7 +175,8 @@ class Scene4(gymGame.Scene):
 
         super()._reset()
 
-        return self._getObservation()  # return obs here
+        self.obs = self._getObservation()
+        return self.obs
 
     def _step(self, action):
         # evaluate action here:
@@ -186,19 +187,23 @@ class Scene4(gymGame.Scene):
         for i in range(self.decision_interval):
             super()._step(action)
             reward += self._getReward()
-            obs = self._getObservation()
+            obs = self._getObservation(transform=False)
             steps += 1
+            current_request_heat_map = obs[0:self.nbases] if self.discrete_state else obs[:, :, 0]
             if request_heat_map is None:
-                request_heat_map = obs[0:self.nbases]
+                request_heat_map = current_request_heat_map
             else:
-                if self.discrete_state:
-                    # add up the request heat map:
-                    request_heat_map = request_heat_map + obs[0:self.nbases]
+                request_heat_map = request_heat_map + current_request_heat_map
             if self._getTerminal():
                 break
-        request_heat_map = request_heat_map / steps
-        obs[0:self.nbases] = request_heat_map
-        return obs, reward, self._getTerminal(), self._getInfo()
+        request_heat_map = request_heat_map / steps  # average over all the steps
+        # replace the request heat map of current obs:
+        if self.discrete_state:
+            obs[0:self.nbases] = request_heat_map
+        else:
+            obs[:, :, 0] = request_heat_map
+        self.obs = self._transform_obs(obs)
+        return self.obs, reward, self._getTerminal(), self._getInfo()
 
     def _render(self, mode='human', close=False):
         if not close:
@@ -206,8 +211,7 @@ class Scene4(gymGame.Scene):
                 from gym.envs.classic_control.rendering import SimpleImageViewer
                 self.viewer = SimpleImageViewer()
             if not self.discrete_state:
-                # self.viewer.imshow(np.clip(self.obs[:, :, 3:6] * 10, 0, 255))
-                obs = self.mainCamera.getLatestFrame()
+                obs = self.obs if mode == 'rgb' else self.mainCamera.getLatestFrame()
                 self.viewer.imshow(obs)
             else:
                 obs = self.mainCamera.getLatestFrame()
@@ -234,103 +238,76 @@ class Scene4(gymGame.Scene):
         else:
             self.ersManager.causeAllocation(action)
 
-    def _getObservation(self):
+    def _transform_obs(self, obs):
+        if self.discrete_state:
+            obs[0:self.nbases] = self._log_transform(
+                obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=0.005)
+            obs[self.nbases: 2 * self.nbases] = self._log_transform(
+                obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=2)
+        else:
+            obs[:, :, 0] = self._log_transform(
+                obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=0.005)
+            obs[:, :, 1] = self._log_transform(
+                obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=2)
+            obs[:, :, 2] = 255 * obs[:, :, 2]
+            assert np.all(obs <= 255)
+            obs = obs.astype(np.uint8)
+        return obs
+
+    def _log_transform(self, x, max_x, max_ans, t=1):
+        return max_ans * np.log(1 + x / t) / np.log(1 + max_x / t)
+
+    def _getObservation(self, transform=True):
         if not self.discrete_state:
             # self.obs = self.mainCamera.getLatestFrame()
-            map_resolution = self._get_observation_shape()[0:2]
-            mins = self.timeKeeper.getTimeOfDayAsPointOnCircle()
-            time_map = np.zeros([map_resolution[1], map_resolution[0]])
-            time_map[0, 0], time_map[0, 1] = int(
-                ((mins[0] + 1) / 2) * 255), int(((mins[1] + 1) / 2) * 255)
+            shape = self._get_observation_shape()[0:2]
+            mins = self.timeKeeper.getTimeOfDayAsFractionOfDayPassed()
+            time_map = mins * np.ones(shape)
+            requests_heat_map = self._to_heat_map(
+                [r.gameObject.position for r in self.ersManager.requestsReceivedInThisFrame])
             alloc_heat_map = self._to_heat_map(
-                [a.currentBase.gameObject.position for a in self.ersManager.ambulances], self.ersManager.AMBULANCE_COUNT)
-            ur_heat_map = self._to_heat_map(
-                [r.gameObject.position for r in self.ersManager.unservedRequests], self.requestsPool.maximumRequests)
-            bs_heat_map = self._to_heat_map(
-                [r.gameObject.position for r in self.ersManager.beingServed | self.ersManager.beingTransportedToHospital], self.requestsPool.maximumRequests)
-            ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital = [], [], [], [], []
-            State = gym_ERSLE.pyERSEnv.Ambulance.State
-            for a in self.ersManager.ambulances:
-                if a.state == State.Idle:
-                    ambs_idle.append(a)
-                elif a.state == State.Relocating:
-                    ambs_relocating.append(a)
-                elif a.state == State.InTransitToBase:
-                    ambs_to_base.append(a)
-                elif a.state == State.InTransitToHospital:
-                    ambs_to_hospital.append(a)
-                elif a.state == State.InTransitToRequest:
-                    ambs_to_request.append(a)
-            ambs_idle_heat_map = self._to_heat_map(
-                [a.gameObject.position for a in ambs_idle + ambs_to_base], self.ersManager.AMBULANCE_COUNT)
-            ambs_relocating_heat_map = self._to_heat_map(
-                [a.gameObject.position for a in ambs_relocating], self.ersManager.AMBULANCE_COUNT)
-            ambs_busy_heat_map = self._to_heat_map(
-                [a.gameObject.position for a in ambs_to_request + ambs_to_hospital], self.ersManager.AMBULANCE_COUNT)
-
-            self.obs = np.stack([
-                time_map,
+                [a.currentBase.gameObject.position for a in self.ersManager.ambulances])
+            obs = np.stack([
+                requests_heat_map,
                 alloc_heat_map,
-                ur_heat_map,
-                bs_heat_map,
-                ambs_idle_heat_map,
-                ambs_relocating_heat_map,
-                ambs_busy_heat_map
+                time_map
             ], axis=2)
-
         else:
-
             mins = self.timeKeeper.getTimeOfDayAsFractionOfDayPassed()
             requests_heat_map = self._to_heat_map_by_base_zone(
-                [r.gameObject.position for r in self.ersManager.requestsReceivedInThisFrame], self.requestsPool.maximumRequests)
+                [r.gameObject.position for r in self.ersManager.requestsReceivedInThisFrame])
             alloc_heat_map = self._to_heat_map_by_base_zone(
-                [a.currentBase.gameObject.position for a in self.ersManager.ambulances], self.ersManager.AMBULANCE_COUNT)
-            # ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, ambs_to_hospital = [], [], [], [], []
-            # State = gym_ERSLE.pyERSEnv.Ambulance.State
-            # for a in self.ersManager.ambulances:
-            #     if a.state == State.Idle:
-            #         ambs_idle.append(a)
-            #     elif a.state == State.Relocating:
-            #         ambs_relocating.append(a)
-            #     elif a.state == State.InTransitToBase:
-            #         ambs_to_base.append(a)
-            #     elif a.state == State.InTransitToHospital:
-            #         ambs_to_hospital.append(a)
-            #     elif a.state == State.InTransitToRequest:
-            #         ambs_to_request.append(a)
-            # ambs_idle_heat_map = self._to_heat_map_by_base_zone([a.gameObject.position for a in ambs_idle]) / self.ersManager.AMBULANCE_COUNT + \
-            #     self._to_heat_map_by_base_zone(
-            #         [a.gameObject.position for a in ambs_to_base]) / self.ersManager.AMBULANCE_COUNT
-            # ambs_relocating_heat_map = self._to_heat_map_by_base_zone(
-            #     [a.gameObject.position for a in ambs_relocating]) / self.ersManager.AMBULANCE_COUNT
-            # ambs_busy_heat_map = self._to_heat_map_by_base_zone([a.gameObject.position for a in ambs_to_request]) / self.ersManager.AMBULANCE_COUNT + \
-            #     self._to_heat_map_by_base_zone(
-            #         [a.gameObject.position for a in ambs_to_hospital]) / self.ersManager.AMBULANCE_COUNT
-            self.obs = np.array(
+                [a.currentBase.gameObject.position for a in self.ersManager.ambulances])
+            obs = np.array(
                 list(requests_heat_map) +
                 list(alloc_heat_map) +
                 [mins])
-        assert list(self.obs.shape) == self._get_observation_shape(), print(
-            '{0}\n{1}'.format(self.obs.shape, self._get_observation_shape()))
-        return self.obs
+        if transform:
+            obs = self._transform_obs(obs)
+        assert list(obs.shape) == self._get_observation_shape(), print(
+            'The shape of returned obs does not match the declared shape:\nobs.shape: {0}\ndeclared: {1}'.format(
+                obs.shape, self._get_observation_shape()))
+        return obs
 
     def _get_observation_shape(self):
         if not self.discrete_state:
-            return [21, 21, 7]
+            return [21, 21, 3]
         else:
             return [2 * self.nbases + 1]
 
-    def _to_heat_map_by_base_zone(self, positions, max_heat):
-        heat_map = np.array([0] * len(self.ersManager.bases))
+    def norm_sqaured(self, p):
+        return p.dot(p)
+
+    def _to_heat_map_by_base_zone(self, positions):
+        heat_map = np.zeros([len(self.ersManager.bases)])
         for p in positions:
-            baseDistances = [np.linalg.norm(p - b.gameObject.position)
-                             for b in self.ersManager.bases]
+            baseDistances = [self.norm_sqaured(
+                p - b.gameObject.position) for b in self.ersManager.bases]
             closestBase = np.argmin(baseDistances)
             heat_map[closestBase] += 1
-        heat_map = heat_map / max_heat
         return heat_map
 
-    def _to_heat_map(self, positions, max_heat):
+    def _to_heat_map(self, positions):
         """
         Parameters
         -----------
@@ -338,19 +315,18 @@ class Scene4(gymGame.Scene):
         Returns
         -------
         `Returns` an np array of shape self._get_observation_shape()[0:2]
-        of type uint8
         """
-        map_resolution = self._get_observation_shape()[0:2]
+        shape = self._get_observation_shape()[0:2]
+        map_resolution = shape[::-1]
         fov = self.fov
         assert len(map_resolution) == 2
         assert len(fov) == 2
-        heat_map_float = np.zeros([map_resolution[1], map_resolution[0]])
+        heat_map_float = np.zeros(shape)
         for p in positions:
             row = int((fov[1] / 2 - p[1]) * map_resolution[1] / fov[1])
             col = int((fov[0] / 2 + p[0]) * map_resolution[0] / fov[0])
             heat_map_float[row, col] += 1
-        heat_map = (heat_map_float * 255 / max_heat).astype(np.uint8)
-        return heat_map
+        return heat_map_float
 
     def _getReward(self):
         reward = 0
