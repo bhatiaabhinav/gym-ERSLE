@@ -140,6 +140,9 @@ class ERSManager(gymGame.GameComponent):
                 baseIndex += 1
                 ambulanceIndex += 1
 
+    def norm_squared(self, p):
+        return p.dot(p)
+
     def relocateAnAmbulance(self, frm, to):
         # print('Relocating')
         if frm != to:
@@ -149,8 +152,8 @@ class ERSManager(gymGame.GameComponent):
                 eligibleAmbs = list(filter(lambda a: a.isBusy() and not a.relocationOrder and a.state !=
                                            gym_ERSLE.pyERSEnv.Ambulance.State.Relocating, frm.allocatedAmbulances))
             if len(eligibleAmbs) > 0:
-                distances = [np.linalg.norm(
-                    a.gameObject.position - to.gameObject.position) for a in eligibleAmbs]
+                distances = [self.norm_squared(a.gameObject.position - to.gameObject.position)
+                             for a in eligibleAmbs]
                 amb = eligibleAmbs[np.argmin(distances)]
                 self.allocateAmbulance(to, amb)
 
@@ -160,8 +163,8 @@ class ERSManager(gymGame.GameComponent):
             nonBusyAmbs = list(
                 filter(lambda a: not a.isBusy(), self.ambulances))
             if len(nonBusyAmbs) > 0:
-                ambsDistances = [np.linalg.norm(
-                    a.gameObject.position - first.gameObject.position) for a in nonBusyAmbs]
+                ambsDistances = [self.norm_squared(a.gameObject.position - first.gameObject.position)
+                                 for a in nonBusyAmbs]
                 bestAmb = nonBusyAmbs[np.argmin(ambsDistances)]
                 bestAmb.dispatch(first)
                 first.informAmbulanceAssigned(bestAmb)

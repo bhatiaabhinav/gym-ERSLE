@@ -3,6 +3,7 @@ import gymGame
 import numpy as np
 import gym_ERSLE.pyERSEnv
 
+
 class Ambulance(gymGame.GameComponent):
 
     class State(Enum):
@@ -22,22 +23,26 @@ class Ambulance(gymGame.GameComponent):
         self.minutesAtRequestSite = 0.
         self.minutesAtHospital = 0.
         self.movePerFrame = 0.
-        self.currentRequest = None # type: gym_ERSLE.pyERSEnv.Request
-        self.currentBase = None # type: gym_ERSLE.pyERSEnv.Base
-        self.currentHospital = None # type: gym_ERSLE.pyERSEnv.Hospital
+        self.currentRequest = None  # type: gym_ERSLE.pyERSEnv.Request
+        self.currentBase = None  # type: gym_ERSLE.pyERSEnv.Base
+        self.currentHospital = None  # type: gym_ERSLE.pyERSEnv.Hospital
         self.state = Ambulance.State.Idle
         self.ID = 0
         self._secondsSpentAtHospital = 0
         self._secondsSpentAtRequestSite = 0
-        self.ersManager = None # type: gym_ERSLE.pyERSEnv.ERSManager
+        self.ersManager = None  # type: gym_ERSLE.pyERSEnv.ERSManager
 
     def awake(self):
-        ersManagerGO = self.gameObject.scene.findObjectByName('ERS Manager') # type: gymGame.GameObject
-        self.ersManager = ersManagerGO.getComponent(gym_ERSLE.pyERSEnv.ERSManager) # type: gym_ERSLE.pyERSEnv.ERSManager
+        ersManagerGO = self.gameObject.scene.findObjectByName(
+            'ERS Manager')  # type: gymGame.GameObject
+        self.ersManager = ersManagerGO.getComponent(
+            gym_ERSLE.pyERSEnv.ERSManager)  # type: gym_ERSLE.pyERSEnv.ERSManager
 
-        timeKeeperGO = self.gameObject.scene.findObjectByName('Time Keeper') # type: gymGame.GameObject
-        self.timeKeeper = timeKeeperGO.getComponent(gym_ERSLE.pyERSEnv.TimeKeeper) # type: gym_ERSLE.pyERSEnv.TimeKeeper
-        
+        timeKeeperGO = self.gameObject.scene.findObjectByName(
+            'Time Keeper')  # type: gymGame.GameObject
+        self.timeKeeper = timeKeeperGO.getComponent(
+            gym_ERSLE.pyERSEnv.TimeKeeper)  # type: gym_ERSLE.pyERSEnv.TimeKeeper
+
         self.ID = self.ersManager.registerAmbulance(self)
         #print('Registered Ambulance with ID {0}'.format(self.ID))
 
@@ -52,18 +57,22 @@ class Ambulance(gymGame.GameComponent):
 
     def moveTowards(self, position):
         diff = position - self.gameObject.position
-        norm = np.linalg.norm(diff)
+        norm = np.sqrt(diff.dot(diff))
         if norm > self.movePerFrame:
             diff = diff * self.movePerFrame / norm
         self.gameObject.move(diff)
 
+    def norm_sqaured(self, p):
+        return p.dot(p)
+
     def findNearestHospital(self):
-        distances = [np.linalg.norm(self.gameObject.position - h.gameObject.position) for h in self.ersManager.hospitals]
+        distances = [self.norm_sqaured(self.gameObject.position - h.gameObject.position)
+                     for h in self.ersManager.hospitals]
         return self.ersManager.hospitals[np.argmin(distances)]
 
     def update(self):
         self.movePerFrame = self.drivingSpeed / self.timeKeeper.simulatedKmsPerUnit
-        self.movePerFrame /= 60*60
+        self.movePerFrame /= 60 * 60
         self.movePerFrame *= self.timeKeeper.simulatedSecondsPerFrame
 
         if self.state == Ambulance.State.Idle:
@@ -89,7 +98,7 @@ class Ambulance(gymGame.GameComponent):
                 self.state = Ambulance.State.Idle
             else:
                 self.moveTowards(self.currentBase.gameObject.position)
-        
+
         elif self.state == Ambulance.State.InTransitToRequest:
             if self.atRequest():
                 self.state = Ambulance.State.WaitingAtRequestSite
@@ -122,7 +131,6 @@ class Ambulance(gymGame.GameComponent):
             self._secondsSpentAtRequestSite += self.timeKeeper.simulatedSecondsPerFrame
             if self._secondsSpentAtRequestSite >= self.minutesAtRequestSite:
                 self.state = Ambulance.State.InTransitToHospital
-
 
     def assignBase(self, b):
         if self.currentBase is not None and self.currentBase != b:
