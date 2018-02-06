@@ -1,6 +1,6 @@
 from gym.envs.registration import register
-from gym_ERSLE.pyERSEnv import ToyScene
-from gym_ERSLE.pyERSEnv import Scene4
+from gym_ERSLE.pyERSEnv import ToyScene  # noqa F401
+from gym_ERSLE.pyERSEnv import Scene4  # noqa F401
 
 version_to_scene_map = {
     'v3': 'gym_ERSLE:ToyScene',
@@ -8,7 +8,7 @@ version_to_scene_map = {
 }
 
 for version in ['v3', 'v4']:
-    for decision_interval in [1, 10, 15, 30, 60, 120, 240, 360, 720, 1440]:
+    for decision_interval in [1, 10, 15, 20, 30, 60, 120, 240, 360, 720, 1440]:
         for ca in [False, True]:
             for im in [False, True]:
                 for dynamic in [False, True]:
