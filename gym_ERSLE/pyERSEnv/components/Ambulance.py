@@ -135,13 +135,14 @@ class Ambulance(gymGame.GameComponent):
     def assignBase(self, b):
         if self.currentBase is not None and self.currentBase != b:
             self.relocationOrder = True
-            if not self.isBusy():
-                self.relocationOrder = False
-                self.state = Ambulance.State.Relocating
+            # if not self.isBusy():
+            #     self.relocationOrder = False
+            #     self.state = Ambulance.State.Relocating
         self.currentBase = b
 
     def isBusy(self):
-        return self.state != Ambulance.State.Idle and self.state != Ambulance.State.InTransitToBase
+        # and self.state != Ambulance.State.InTransitToBase
+        return self.state != Ambulance.State.Idle
 
     def dispatch(self, r):
         if not self.isBusy():

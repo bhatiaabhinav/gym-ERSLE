@@ -11,6 +11,7 @@ class RequestsGenerator(gymGame.GameComponent):
         self.requestsPerHour = 2.0
         self.width = 4
         self.height = 4
+        self._generates_blip = False
 
     def awake(self):
         timeKeeperGO = self.gameObject.scene.findObjectByName(
@@ -22,6 +23,8 @@ class RequestsGenerator(gymGame.GameComponent):
             'Requests Pool')  # type: gymGame.GameObject
         self.requestsPool = requestsPoolGO.getComponent(
             gym_ERSLE.pyERSEnv.RequestsPool)  # type: gym_ERSLE.pyERSEnv.RequestsPool
+        blips_component = self.gameObject.getComponent(Blip)  # type: Blip
+        self._generates_blip = blips_component is not None and blips_component._isEnabled
 
     def update(self):
         requestsPerSecond = self.requestsPerHour / 3600
@@ -30,9 +33,13 @@ class RequestsGenerator(gymGame.GameComponent):
         rand = self.gameObject.scene.random
         r = rand.random()
         if r < requestProbability:
-            x = self.gameObject.position[0] + self.width * (rand.random() - 0.5)
-            y = self.gameObject.position[1] + self.height * (rand.random() - 0.5)
-            self.requestsPool.createNew(np.array([x, y, 0]))
+            x = self.gameObject.position[0] + \
+                self.width * (rand.random() - 0.5)
+            y = self.gameObject.position[1] + \
+                self.height * (rand.random() - 0.5)
+            r = self.requestsPool.createNew(np.array([x, y, 0]))
+            if r is not None:
+                r.is_part_of_blip = self._generates_blip
 
 
 class DynamicRequestRate(gymGame.GameComponent):
@@ -41,7 +48,8 @@ class DynamicRequestRate(gymGame.GameComponent):
         self.peak_time = 0  # in terms of fraction of day passed
 
     def awake(self):
-        self.rg = self.gameObject.getComponent(RequestsGenerator)  # type: RequestsGenerator
+        self.rg = self.gameObject.getComponent(
+            RequestsGenerator)  # type: RequestsGenerator
         time_keeper_GO = self.gameObject.scene.findObjectByName(
             'Time Keeper')  # type: gymGame.GameObject
         self.time_keeper = time_keeper_GO.getComponent(
@@ -53,7 +61,8 @@ class DynamicRequestRate(gymGame.GameComponent):
     def update(self):
         peak_time_angle = self.peak_time * math.pi
         cur_time_angle = self.time_keeper.getTimeOfDayAsFractionOfDayPassed() * math.pi
-        self.rg.requestsPerHour = self.max_rph * (math.cos(peak_time_angle - cur_time_angle)**2)
+        self.rg.requestsPerHour = self.max_rph * \
+            (math.cos(peak_time_angle - cur_time_angle)**2)
 
 
 class Blip(gymGame.GameComponent):
@@ -64,7 +73,8 @@ class Blip(gymGame.GameComponent):
         self.peak_sigma = peak_sigma
 
     def awake(self):
-        self.rg = self.gameObject.getComponent(RequestsGenerator)  # type: RequestsGenerator
+        self.rg = self.gameObject.getComponent(
+            RequestsGenerator)  # type: RequestsGenerator
         time_keeper_GO = self.gameObject.scene.findObjectByName(
             'Time Keeper')  # type: gymGame.GameObject
         self.time_keeper = time_keeper_GO.getComponent(

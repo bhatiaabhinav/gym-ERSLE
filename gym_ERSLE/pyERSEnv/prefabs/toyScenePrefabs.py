@@ -11,7 +11,8 @@ class AmbulancePrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=0.3, h=0.3)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.ambulance, w=0.3, h=0.3)
+        visual = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.ambulance, w=0.3, h=0.3)
         amb = gym_ERSLE.pyERSEnv.Ambulance()
         amb.state = gym_ERSLE.pyERSEnv.Ambulance.State.Idle
         amb.drivingSpeed = 30.0
@@ -41,8 +42,10 @@ class BasePrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=1, h=1)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base, w=0.5, h=0.5, static=True)
-        visual_level = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.base_level, w=0.5, h=0.5)
+        visual = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.base, w=0.5, h=0.5, static=True)
+        visual_level = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.base_level, w=0.5, h=0.5)
         visual_level.tag = 'level'
         b = gym_ERSLE.pyERSEnv.Base()
         b.initialAllocationPercentage = 100
@@ -84,9 +87,11 @@ class RequestPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         boxCollider = gymGame.BoxCollider2D(w=0.25, h=0.25)
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.requestOld, w=0.25, h=0.25)
+        visual = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.requestOld, w=0.25, h=0.25)
         visual.tag = 'sprite_request_old'
-        visual2 = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.requestNew, w=0.25, h=0.25)
+        visual2 = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.requestNew, w=0.25, h=0.25)
         visual2.tag = 'sprite_request_new'
         visual._isEnabled = False
         r = gym_ERSLE.pyERSEnv.Request()
@@ -101,7 +106,7 @@ class RequestsPoolPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
         rp = gym_ERSLE.pyERSEnv.RequestsPool()
-        rp.maximumRequests = 50
+        rp.maximumRequests = 100
         rp.stashPoint = np.array([-100, -100, 0])
         rp.requestPrefab = RequestPrefab
         self.addComponent(rp)
@@ -124,7 +129,8 @@ class TimeKeeperPrefab(gymGame.GameObject):
         g = gym_ERSLE.pyERSEnv.TimeKeeper()
         g.simulatedKmsPerUnit = 3
         g.simulatedSecondsPerFrame = 60
-        visual = gymGame.SimpleSprite(gym_ERSLE.pyERSEnv.sprites.clock, w=1, h=1)
+        visual = gymGame.SimpleSprite(
+            gym_ERSLE.pyERSEnv.sprites.clock, w=1, h=1)
         self.addComponent(g)
         self.addComponent(visual)
         self.name = 'Time Keeper'

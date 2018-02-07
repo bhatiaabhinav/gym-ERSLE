@@ -17,7 +17,8 @@ class ERSManager(gymGame.GameComponent):
         # type: Set[gym_ERSLE.pyERSEnv.Request]
         self.beingTransportedToHospital = set()
         self.ambulancePrefab = None
-        self.requestsServedInThisFrame = []  # type: List[gym_ERSLE.pyERSEnv.Request]
+        self.requestsServedInThisFrameTimes = []
+        self.blipRequestsServedInThisFrameTimes = []
         self.requestsReceivedInThisFrame = []  # type: List[gym_ERSLE.pyERSEnv.Request]
 
     def awake(self):
@@ -44,7 +45,9 @@ class ERSManager(gymGame.GameComponent):
         r.informAmbulanceArrived()
         self.beingServed.remove(r)
         self.beingTransportedToHospital.add(r)
-        self.requestsServedInThisFrame.append(r)
+        self.requestsServedInThisFrameTimes.append(r.servedIn)
+        if r.is_part_of_blip:
+            self.blipRequestsServedInThisFrameTimes.append(r.servedIn)
 
     def markAsReachedHospital(self, r):
         r.informReachedHospital()
@@ -145,12 +148,15 @@ class ERSManager(gymGame.GameComponent):
 
     def relocateAnAmbulance(self, frm, to):
         # print('Relocating')
+        State = gym_ERSLE.pyERSEnv.Ambulance.State
         if frm != to:
-            eligibleAmbs = list(filter(lambda a: not a.isBusy(
-            ) and not a.relocationOrder, frm.allocatedAmbulances))
+            # give preference to move a going back or idle ambualance first
+            eligibleAmbs = list(filter(lambda a: (a.state == State.Idle or a.state ==
+                                                  State.InTransitToBase) and not a.relocationOrder, frm.allocatedAmbulances))
             if len(eligibleAmbs) == 0:
-                eligibleAmbs = list(filter(lambda a: a.isBusy() and not a.relocationOrder and a.state !=
-                                           gym_ERSLE.pyERSEnv.Ambulance.State.Relocating, frm.allocatedAmbulances))
+                # pick up any one (which isn't already relocating) if there is no amb which is either idle or going back:
+                eligibleAmbs = list(filter(lambda a: not a.relocationOrder and a.state !=
+                                           State.Relocating, frm.allocatedAmbulances))
             if len(eligibleAmbs) > 0:
                 distances = [self.norm_squared(a.gameObject.position - to.gameObject.position)
                              for a in eligibleAmbs]
@@ -174,6 +180,7 @@ class ERSManager(gymGame.GameComponent):
                 break
 
     def update(self):
-        self.requestsServedInThisFrame.clear()
+        self.requestsServedInThisFrameTimes.clear()
+        self.blipRequestsServedInThisFrameTimes.clear()
         self.requestsReceivedInThisFrame.clear()
         self.serveRequests()

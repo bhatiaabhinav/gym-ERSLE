@@ -182,11 +182,15 @@ class Scene4(gymGame.Scene):
         # evaluate action here:
         self._act(action)
         reward = 0
+        blip_reward = 0
         request_heat_map = None
         steps = 0
         for i in range(self.decision_interval):
             super()._step(action)
             reward += self._getReward()
+            info = self._getInfo()
+            blip_reward += info['blip_reward']
+            info['blip_reward'] = blip_reward
             obs = self._getObservation(transform=False)
             steps += 1
             current_request_heat_map = obs[0:self.nbases] if self.discrete_state else obs[:, :, 0]
@@ -203,7 +207,7 @@ class Scene4(gymGame.Scene):
         else:
             obs[:, :, 0] = request_heat_map
         self.obs = self._transform_obs(obs)
-        return self.obs, reward, self._getTerminal(), self._getInfo()
+        return self.obs, reward, self._getTerminal(), info
 
     def _render(self, mode='human', close=False):
         if not close:
@@ -243,12 +247,12 @@ class Scene4(gymGame.Scene):
             obs[0:self.nbases] = self._log_transform(
                 obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=0.005)
             obs[self.nbases: 2 * self.nbases] = self._log_transform(
-                obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=2)
+                obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=5)
         else:
             obs[:, :, 0] = self._log_transform(
                 obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=0.005)
             obs[:, :, 1] = self._log_transform(
-                obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=2)
+                obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=5)
             obs[:, :, 2] = 255 * obs[:, :, 2]
             assert np.all(obs <= 255)
             obs = obs.astype(np.uint8)
@@ -330,42 +334,45 @@ class Scene4(gymGame.Scene):
 
     def _getReward(self):
         reward = 0
-        max_reward = 0
-        for r in self.ersManager.requestsServedInThisFrame:
-            if r.servedIn < self.fullRewardDeadline:
+        # max_reward = 0
+        for t in self.ersManager.requestsServedInThisFrameTimes:
+            if t <= self.fullRewardDeadline:
                 reward += 1
-            elif r.servedIn < 2 * self.fullRewardDeadline:
-                reward += 0
-            else:
-                reward += 0
-            max_reward += 1
-        return reward / max_reward if max_reward > 0 else 0
+        #     max_reward += 1  # why this clipping?? Nooooooooooooooooo
+        # return reward / max_reward if max_reward > 0 else 0
+        return reward
 
     def _getTerminal(self):
         return self.timeKeeper.minutes >= 1440
 
     def _getInfo(self):
-        ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, \
-            ambs_to_hospital = 0, 0, 0, 0, 0
-        State = gym_ERSLE.pyERSEnv.Ambulance.State
-        for a in self.ersManager.ambulances:
-            if a.state == State.Idle:
-                ambs_idle += 1
-            elif a.state == State.Relocating:
-                ambs_relocating += 1
-            elif a.state == State.InTransitToBase:
-                ambs_to_base += 1
-            elif a.state == State.InTransitToHospital:
-                ambs_to_hospital += 1
-            elif a.state == State.InTransitToRequest:
-                ambs_to_request += 1
-        info = {
-            'ambs_idle': ambs_idle,
-            'ambs_relocating': ambs_relocating,
-            'ambs_to_base': ambs_to_base,
-            'ambs_to_request': ambs_to_request,
-            'ambs_to_hospital': ambs_to_hospital
-        }
-        for b in self.ersManager.bases:
-            info['base{0}'.format(b.ID)] = len(b.allocatedAmbulances)
+        # ambs_idle, ambs_relocating, ambs_to_base, ambs_to_request, \
+        #     ambs_to_hospital = 0, 0, 0, 0, 0
+        # State = gym_ERSLE.pyERSEnv.Ambulance.State
+        # for a in self.ersManager.ambulances:
+        #     if a.state == State.Idle:
+        #         ambs_idle += 1
+        #     elif a.state == State.Relocating:
+        #         ambs_relocating += 1
+        #     elif a.state == State.InTransitToBase:
+        #         ambs_to_base += 1
+        #     elif a.state == State.InTransitToHospital:
+        #         ambs_to_hospital += 1
+        #     elif a.state == State.InTransitToRequest:
+        #         ambs_to_request += 1
+        # info = {
+        #     'ambs_idle': ambs_idle,
+        #     'ambs_relocating': ambs_relocating,
+        #     'ambs_to_base': ambs_to_base,
+        #     'ambs_to_request': ambs_to_request,
+        #     'ambs_to_hospital': ambs_to_hospital
+        # }
+        # for b in self.ersManager.bases:
+        #     info['base{0}'.format(b.ID)] = len(b.allocatedAmbulances)
+        info = {}
+        blip_reward = 0
+        for t in self.ersManager.blipRequestsServedInThisFrameTimes:
+            if t <= self.fullRewardDeadline:
+                blip_reward += 1
+        info['blip_reward'] = blip_reward
         return info
