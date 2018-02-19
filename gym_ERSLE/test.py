@@ -35,7 +35,7 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
             obs, r, d, _ = env.step(action)
             f += 1
             if render:
-                env.render(mode='rgb')
+                env.render(mode='human')
             # time.sleep(1/60)
             R += r
             blip_R += _['blip_reward']
@@ -68,6 +68,7 @@ parser.add_argument('--alloc', help='static allocaton to test',
                     default="[2,2,2,2,2,2,2,2,2,2,2,2]")
 args = parser.parse_args()
 alloc = np.array(ast.literal_eval(args.alloc))
+alloc = [1] * 25
 print('alloc={0}'.format(alloc))
 alloc = alloc / np.sum(alloc)
 eval(args.env, episodes=args.episodes,
