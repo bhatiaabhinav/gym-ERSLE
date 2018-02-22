@@ -6,8 +6,14 @@ from gym_ERSLE.pyERSEnv import Scene5  # noqa F401
 version_to_scene_map = {
     'v3': 'gym_ERSLE:ToyScene',
     'v4': 'gym_ERSLE:Scene4',
-    'v5': 'gym_ERSLE:Scene5'
+    'v5': 'gym_ERSLE:Scene5',
+    'v6': 'gym_ERSLE:Scene5',
+    'v7': 'gym_ERSLE:Scene5',
+    'v8': 'gym_ERSLE:Scene5'
 }
+
+version_to_ambs_map = {'v4': 24, 'v5': 50, 'v6': 32, 'v7': 25, 'v8': 25}
+version_to_bases_map = {'v4': 12, 'v5': 25, 'v6': 25, 'v7': 25, 'v8': 16}
 
 for version in ['v3', 'v4']:
     for decision_interval in [1, 10, 15, 20, 30, 60, 120, 240, 360, 720, 1440]:
@@ -32,7 +38,7 @@ for version in ['v3', 'v4']:
                         )
 
 
-for version in ['v5']:
+for version in ['v5', 'v6', 'v7', 'v8']:
     for decision_interval in [1, 10, 15, 20, 30, 60, 120, 240, 360, 720, 1440]:
         for ca in [False, True]:
             for im in [False, True]:
@@ -50,7 +56,7 @@ for version in ['v5']:
                             entry_point=version_to_scene_map[version],
                             kwargs={'discrete_action': not ca, 'discrete_state': not im,
                                     'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
-                                    'nbases': 25, 'nambs': 50, 'nhospitals': 36},
+                                    'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version], 'nhospitals': 36},
                             max_episode_steps=10000000,
                             nondeterministic=False
                         )

@@ -281,13 +281,21 @@ class Scene5(gymGame.Scene):
     def norm_sqaured(self, p):
         return p.dot(p)
 
-    def _to_heat_map_by_base_zone(self, positions):
+    def __to_heat_map_by_base_zone(self, positions):
         heat_map = np.zeros([len(self.ersManager.bases)])
         for p in positions:
             baseDistances = [self.norm_sqaured(
                 p - b.gameObject.position) for b in self.ersManager.bases]
             closestBase = np.argmin(baseDistances)
             heat_map[closestBase] += 1
+        return heat_map
+
+    def _to_heat_map_by_base_zone(self, positions):
+        heat_map = np.zeros([len(self.ersManager.bases)])
+        if len(positions) > 0:
+            closestBases = self.ersManager.nearest_bases(positions)[:, 0]
+            for b_id in closestBases:
+                heat_map[b_id] += 1
         return heat_map
 
     def _to_heat_map(self, positions):

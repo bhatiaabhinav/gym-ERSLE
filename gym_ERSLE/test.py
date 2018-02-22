@@ -18,6 +18,8 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
     print('Evaluating {0} for {1} episodes. Seed={2}'.format(
         env_name, episodes, seed))
     env = gym.make(env_name)  # type: gym.Env
+    if action == 'uniform':
+        action = [1] * env.action_space.shape[0]
     env.seed(seed)
     tstart = time.time()
     Rs = []
@@ -55,6 +57,15 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
     print()
 
 
+def str2bool(v):
+    if v is True or v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v is False or v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 parser = argparse.ArgumentParser(
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--env', help='environment ID',
@@ -63,14 +74,16 @@ parser.add_argument(
     '--seed', help='initial env seed for testing', default=42, type=int)
 parser.add_argument(
     '--episodes', help='Test for how many episodes', default=5, type=int)
-parser.add_argument('--render', help='render?', default=False, type=bool)
+parser.add_argument('--render', help='render?', default=False, type=str2bool)
 parser.add_argument('--alloc', help='static allocaton to test',
-                    default="[2,2,2,2,2,2,2,2,2,2,2,2]")
+                    default="uniform")
 args = parser.parse_args()
-alloc = np.array(ast.literal_eval(args.alloc))
-alloc = [1] * 25
-print('alloc={0}'.format(alloc))
-alloc = alloc / np.sum(alloc)
+print('alloc={0}'.format(args.alloc))
+if args.alloc == 'uniform':
+    alloc = args.alloc
+else:
+    alloc = np.array(ast.literal_eval(args.alloc))
+    alloc = alloc / np.sum(alloc)
 eval(args.env, episodes=args.episodes,
      render=args.render, seed=args.seed, action=alloc)
 # eval('PongNoFrameskip-v4', episodes=20)

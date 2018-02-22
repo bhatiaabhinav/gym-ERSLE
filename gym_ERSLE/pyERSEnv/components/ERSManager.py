@@ -124,24 +124,14 @@ class ERSManager(gymGame.GameComponent):
         b.addAmbulance(a)
 
     def start(self):
-        allocated = 0
-        sum = np.sum([b.initialAllocationPercentage for b in self.bases])
         ambulanceIndex = 0
-        for b in self.bases:
-            allocateToThisBase = (
-                b.initialAllocationPercentage * self.AMBULANCE_COUNT) / sum
-            allocated += allocateToThisBase
-            while ambulanceIndex < allocated:
-                self.allocateAmbulance(b, self.ambulances[ambulanceIndex])
-                ambulanceIndex += 1
-        # any remaining ambulance, distribute evenly:
-        baseIndex = 0
-        if allocated < self.AMBULANCE_COUNT:
-            while ambulanceIndex < self.AMBULANCE_COUNT:
-                self.allocateAmbulance(
-                    self.bases[baseIndex], self.ambulances[ambulanceIndex])
-                baseIndex += 1
-                ambulanceIndex += 1
+        alloc = self._normalizedAllocation(
+            [b.initialAllocationPercentage for b in self.bases])
+        while ambulanceIndex < self.AMBULANCE_COUNT:
+            for b, b_amb_count in zip(self.bases, alloc):
+                for i in range(int(b_amb_count)):
+                    self.allocateAmbulance(b, self.ambulances[ambulanceIndex])
+                    ambulanceIndex += 1
 
     def norm_squared(self, p):
         return p.dot(p)
@@ -184,3 +174,19 @@ class ERSManager(gymGame.GameComponent):
         self.blipRequestsServedInThisFrameTimes.clear()
         self.requestsReceivedInThisFrame.clear()
         self.serveRequests()
+
+    def nearest_bases(self, positions, k=1, return_distance=False):
+        if not hasattr(self, '_bases_kdt'):
+            # print('Building bases KDT')
+            from sklearn.neighbors import KDTree
+            self._bases_kdt = KDTree(
+                [b.gameObject.position for b in self.bases], leaf_size=1)
+        return self._bases_kdt.query(positions, k=k, return_distance=return_distance)
+
+    def nearest_hospitals(self, positions, k=1, return_distance=False):
+        if not hasattr(self, '_hospitals_kdt'):
+            # print('Building hospitals KDT')
+            from sklearn.neighbors import KDTree
+            self._hospitals_kdt = KDTree(
+                [h.gameObject.position for h in self.hospitals], leaf_size=1)
+        return self._hospitals_kdt.query(positions, k=k, return_distance=return_distance)

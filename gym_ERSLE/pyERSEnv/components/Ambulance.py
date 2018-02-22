@@ -46,6 +46,10 @@ class Ambulance(gymGame.GameComponent):
         self.ID = self.ersManager.registerAmbulance(self)
         #print('Registered Ambulance with ID {0}'.format(self.ID))
 
+        self.movePerFrame = self.drivingSpeed / self.timeKeeper.simulatedKmsPerUnit
+        self.movePerFrame /= 60 * 60
+        self.movePerFrame *= self.timeKeeper.simulatedSecondsPerFrame
+
     def atBase(self):
         return self.currentBase is not None and self.gameObject.collider2D.isTouching(self.currentBase.gameObject.collider2D)
 
@@ -66,14 +70,9 @@ class Ambulance(gymGame.GameComponent):
         return p.dot(p)
 
     def findNearestHospital(self):
-        distances = [self.norm_sqaured(self.gameObject.position - h.gameObject.position)
-                     for h in self.ersManager.hospitals]
-        return self.ersManager.hospitals[np.argmin(distances)]
+        return self.ersManager.hospitals[self.ersManager.nearest_hospitals([self.gameObject.position])[0][0]]
 
     def update(self):
-        self.movePerFrame = self.drivingSpeed / self.timeKeeper.simulatedKmsPerUnit
-        self.movePerFrame /= 60 * 60
-        self.movePerFrame *= self.timeKeeper.simulatedSecondsPerFrame
 
         if self.state == Ambulance.State.Idle:
             if self.relocationOrder:
