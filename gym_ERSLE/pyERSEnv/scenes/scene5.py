@@ -8,7 +8,7 @@ from gym import spaces
 class Scene5(gymGame.Scene):
     metadata = {'render.modes': ['human', 'rgb']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36, log_transform_obs=True):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -21,6 +21,7 @@ class Scene5(gymGame.Scene):
         self.random_blips = random_blips
         self.starting_allocation = [1] * nbases
         self.nact = self.nbases * (self.nbases - 1) + 1
+        self.log_transform_obs = log_transform_obs
         if discrete_action:
             self.action_space = spaces.Discrete(self.nact)
         else:
@@ -223,15 +224,27 @@ class Scene5(gymGame.Scene):
 
     def _transform_obs(self, obs):
         if self.discrete_state:
-            obs[0:self.nbases] = self._log_transform(
-                obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=0.005)
-            obs[self.nbases: 2 * self.nbases] = self._log_transform(
-                obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=5)
+            if self.log_transform_obs:
+                obs[0:self.nbases] = self._log_transform(
+                    obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=0.005)
+                obs[self.nbases: 2 * self.nbases] = self._log_transform(
+                    obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=5)
+            else:
+                obs[0:self.nbases] = obs[0:self.nbases] / \
+                    self.requestsPool.maximumRequests
+                obs[self.nbases: 2 * self.nbases] = obs[self.nbases: 2 *
+                                                        self.nbases] / self.ersManager.AMBULANCE_COUNT
         else:
-            obs[:, :, 0] = self._log_transform(
-                obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=0.005)
-            obs[:, :, 1] = self._log_transform(
-                obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=5)
+            if self.log_transform_obs:
+                obs[:, :, 0] = self._log_transform(
+                    obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=0.005)
+                obs[:, :, 1] = self._log_transform(
+                    obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=5)
+            else:
+                obs[:, :, 0] = 255 * obs[:, :, 0] / \
+                    self.requestsPool.maximumRequests
+                obs[:, :, 1] = 255 * obs[:, :, 1] / \
+                    self.ersManager.AMBULANCE_COUNT
             obs[:, :, 2] = 255 * obs[:, :, 2]
             assert np.all(obs <= 255)
             obs = obs.astype(np.uint8)
