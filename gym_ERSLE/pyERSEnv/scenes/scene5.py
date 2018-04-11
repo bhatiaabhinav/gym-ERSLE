@@ -33,6 +33,7 @@ class Scene5(gymGame.Scene):
             'random_blips': random_blips,
             'log_transform_obs': log_transform_obs
         }
+        gym_ERSLE.pyERSEnv.Ambulance.treat_transit_to_base_as_busy = True
         if discrete_action:
             self.action_space = spaces.Discrete(self.nact)
         else:

@@ -5,6 +5,7 @@ import gym_ERSLE.pyERSEnv
 
 
 class Ambulance(gymGame.GameComponent):
+    treat_transit_to_base_as_busy = True
 
     class State(Enum):
         Idle = 0
@@ -141,7 +142,10 @@ class Ambulance(gymGame.GameComponent):
 
     def isBusy(self):
         # and self.state != Ambulance.State.InTransitToBase
-        return self.state != Ambulance.State.Idle
+        if Ambulance.treat_transit_to_base_as_busy:
+            return self.state != Ambulance.State.Idle
+        else:
+            return not(self.state == Ambulance.State.Idle or self.state == Ambulance.State.InTransitToBase)
 
     def dispatch(self, r):
         if not self.isBusy():
