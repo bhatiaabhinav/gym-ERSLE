@@ -22,6 +22,9 @@ class Scene5(gymGame.Scene):
         self.starting_allocation = [1] * nbases
         self.nact = self.nbases * (self.nbases - 1) + 1
         self.log_transform_obs = log_transform_obs
+        self.log_transform_alloc_t = 5
+        self.log_transform_req_map_t = 0.005
+        self.max_requests = 100
         self.metadata = {
             'nbases': nbases,
             'nambs': nambs,
@@ -31,7 +34,11 @@ class Scene5(gymGame.Scene):
             'decision_interval': decision_interval,
             'dynamic': dynamic,
             'random_blips': random_blips,
-            'log_transform_obs': log_transform_obs
+            'log_transform_obs': log_transform_obs,
+            'log_transform_alloc_t': self.log_transform_alloc_t,
+            'log_transform_req_map_t': self.log_transform_req_map_t,
+            'full_reward_deadline': self.fullRewardDeadline,
+            'max_requests': self.max_requests
         }
         gym_ERSLE.pyERSEnv.Ambulance.treat_transit_to_base_as_busy = True
         if discrete_action:
@@ -82,6 +89,7 @@ class Scene5(gymGame.Scene):
             gym_ERSLE.pyERSEnv.RequestsPoolPrefab)  # type: gymGame.GameObject
         self.requestsPool = requestsPoolGO.getComponent(
             gym_ERSLE.pyERSEnv.RequestsPool)  # type: gym_ERSLE.pyERSEnv.RequestsPool
+        self.requestsPool.maximumRequests = self.max_requests
 
         mainRequestsGenerator = self.instantiate(
             gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab)
@@ -238,9 +246,9 @@ class Scene5(gymGame.Scene):
         if self.discrete_state:
             if self.log_transform_obs:
                 obs[0:self.nbases] = self._log_transform(
-                    obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=0.005)
+                    obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=self.log_transform_req_map_t)
                 obs[self.nbases: 2 * self.nbases] = self._log_transform(
-                    obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=5)
+                    obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=self.log_transform_alloc_t)
             else:
                 obs[0:self.nbases] = obs[0:self.nbases] / \
                     self.requestsPool.maximumRequests
@@ -249,9 +257,9 @@ class Scene5(gymGame.Scene):
         else:
             if self.log_transform_obs:
                 obs[:, :, 0] = self._log_transform(
-                    obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=0.005)
+                    obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=self.log_transform_req_map_t)
                 obs[:, :, 1] = self._log_transform(
-                    obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=5)
+                    obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=self.log_transform_alloc_t)
             else:
                 obs[:, :, 0] = 255 * obs[:, :, 0] / \
                     self.requestsPool.maximumRequests
