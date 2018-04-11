@@ -22,6 +22,17 @@ class Scene5(gymGame.Scene):
         self.starting_allocation = [1] * nbases
         self.nact = self.nbases * (self.nbases - 1) + 1
         self.log_transform_obs = log_transform_obs
+        self.metadata = {
+            'nbases': nbases,
+            'nambs': nambs,
+            'nhospitals': nhospitals,
+            'discrete_action': discrete_action,
+            'discrete_state': discrete_state,
+            'decision_interval': decision_interval,
+            'dynamic': dynamic,
+            'random_blips': random_blips,
+            'log_transform_obs': log_transform_obs
+        }
         if discrete_action:
             self.action_space = spaces.Discrete(self.nact)
         else:
@@ -155,7 +166,7 @@ class Scene5(gymGame.Scene):
 
         super()._reset()
 
-        self.obs = self._getObservation()
+        self.obs = self._getObservation(transform=True)
         return self.obs
 
     def _step(self, action):
