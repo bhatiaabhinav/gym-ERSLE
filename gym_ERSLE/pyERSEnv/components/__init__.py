@@ -7,3 +7,4 @@ from .Hospital import Hospital
 from .Request import Request
 from .RequestsGenerator import RequestsGenerator, DynamicRequestRate, Blip
 from .RequestsPool import RequestsPool
+from .MapBasedRequestGenerator import MapBasedRequestGenerator, RPHMapUtils

@@ -1,7 +1,10 @@
+import math
+from typing import List  # noqa: F401
+
+import numpy as np
+
 import gym_ERSLE.pyERSEnv
 import gymGame
-import numpy as np
-import math
 
 
 class RequestsGenerator(gymGame.GameComponent):
@@ -29,6 +32,7 @@ class RequestsGenerator(gymGame.GameComponent):
     def update(self):
         requestsPerSecond = self.requestsPerHour / 3600
         requestsPerFrame = requestsPerSecond * self.timeKeeper.simulatedSecondsPerFrame
+        assert requestsPerFrame < 1
         requestProbability = requestsPerFrame
         rand = self.gameObject.scene.random
         r = rand.random()

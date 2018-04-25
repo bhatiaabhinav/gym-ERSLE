@@ -2,6 +2,7 @@ from gym.envs.registration import register
 from gym_ERSLE.pyERSEnv import ToyScene  # noqa F401
 from gym_ERSLE.pyERSEnv import Scene4  # noqa F401
 from gym_ERSLE.pyERSEnv import Scene5  # noqa F401
+from gym_ERSLE.pyERSEnv import SgScene  # noqa F401
 
 version_to_scene_map = {
     'v3': 'gym_ERSLE:ToyScene',
@@ -57,6 +58,25 @@ for version in ['v5', 'v6', 'v7', 'v8']:
                                     version
                                 ),
                                 entry_point=version_to_scene_map[version],
+                                kwargs={'discrete_action': not ca, 'discrete_state': not im,
+                                        'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
+                                        'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],
+                                        'nhospitals': 36, 'log_transform_obs': log_transform_obs},
+                                max_episode_steps=10000000,
+                                nondeterministic=False
+                            )
+                            register(
+                                id='SgERSEnv{0}{1}{2}{3}{4}{5}-{6}'.format(
+                                    '-im' if im else '',
+                                    '-ca' if ca else '',
+                                    '-dynamic' if dynamic else '',
+                                    '-blips' if blips else '',
+                                    '-nolog' if not log_transform_obs else '',
+                                    '-{0}'.format(
+                                        decision_interval) if decision_interval > 1 else '',
+                                    version
+                                ),
+                                entry_point='gym_ERSLE:SgScene',
                                 kwargs={'discrete_action': not ca, 'discrete_state': not im,
                                         'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
                                         'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],

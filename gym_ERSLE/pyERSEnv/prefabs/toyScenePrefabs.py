@@ -83,6 +83,16 @@ class RequestsGeneratorPrefab(gymGame.GameObject):
         self.name = 'Requests Generator'
 
 
+class MapRequestsGeneratorPrefab(gymGame.GameObject):
+    def __init__(self):
+        super().__init__()
+        rg = gym_ERSLE.pyERSEnv.MapBasedRequestGenerator()
+        rg.width = 14
+        rg.height = 10
+        self.addComponent(rg)
+        self.name = "Map Requests Generator"
+
+
 class RequestPrefab(gymGame.GameObject):
     def __init__(self):
         super().__init__()
