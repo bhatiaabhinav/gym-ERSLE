@@ -8,7 +8,7 @@ from gym import spaces
 class Scene5(gymGame.Scene):
     metadata = {'render.modes': ['human', 'rgb']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36, log_transform_obs=True):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -21,9 +21,6 @@ class Scene5(gymGame.Scene):
         self.random_blips = random_blips
         self.starting_allocation = [1] * nbases
         self.nact = self.nbases * (self.nbases - 1) + 1
-        self.log_transform_obs = log_transform_obs
-        self.log_transform_alloc_t = 5
-        self.log_transform_req_map_t = 0.005
         self.max_requests = 100
         self.metadata = {
             'nbases': nbases,
@@ -34,9 +31,6 @@ class Scene5(gymGame.Scene):
             'decision_interval': decision_interval,
             'dynamic': dynamic,
             'random_blips': random_blips,
-            'log_transform_obs': log_transform_obs,
-            'log_transform_alloc_t': self.log_transform_alloc_t,
-            'log_transform_req_map_t': self.log_transform_req_map_t,
             'full_reward_deadline': self.fullRewardDeadline,
             'max_requests': self.max_requests
         }
@@ -44,10 +38,11 @@ class Scene5(gymGame.Scene):
         if discrete_action:
             self.action_space = spaces.Discrete(self.nact)
         else:
-            self.action_space = spaces.Box(0, 1, shape=[self.nbases])
+            self.action_space = spaces.Box(
+                0, self.nambs, shape=[self.nbases], dtype=np.float32)
         if self.discrete_state:
-            self.observation_space = spaces.Box(
-                0, 1, shape=self._get_observation_shape())
+            self.observation_space = spaces.Box(low=np.array([0] * (2 * self.nbases + 1)), high=np.array(
+                [self.max_requests] * self.nbases + [self.nambs] * self.nbases + [1]), dtype=np.float32)
         else:
             self.observation_space = spaces.Box(
                 0, 255, shape=self._get_observation_shape())
@@ -63,7 +58,7 @@ class Scene5(gymGame.Scene):
                 positions.append([x, y, 0])
         return positions
 
-    def _reset(self):
+    def reset(self):
 
         self._destroyObjects()
 
@@ -173,12 +168,12 @@ class Scene5(gymGame.Scene):
             gymGame.Camera
         ])
 
-        super()._reset()
+        super().reset()
 
         self.obs = self._getObservation(transform=True)
         return self.obs
 
-    def _step(self, action):
+    def step(self, action):
         # evaluate action here:
         self._act(action)
         reward = 0
@@ -186,7 +181,7 @@ class Scene5(gymGame.Scene):
         request_heat_map = None
         steps = 0
         for i in range(self.decision_interval):
-            super()._step(action)
+            super().step(action)
             reward += self._getReward()
             info = self._getInfo()
             blip_reward += info['blip_reward']
@@ -209,7 +204,7 @@ class Scene5(gymGame.Scene):
         self.obs = self._transform_obs(obs)
         return self.obs, reward, self._getTerminal(), info
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         if not close:
             if self.viewer is None:
                 from gym.envs.classic_control.rendering import SimpleImageViewer
@@ -244,34 +239,16 @@ class Scene5(gymGame.Scene):
 
     def _transform_obs(self, obs):
         if self.discrete_state:
-            if self.log_transform_obs:
-                obs[0:self.nbases] = self._log_transform(
-                    obs[0:self.nbases], self.requestsPool.maximumRequests, 1, t=self.log_transform_req_map_t)
-                obs[self.nbases: 2 * self.nbases] = self._log_transform(
-                    obs[self.nbases: 2 * self.nbases], self.ersManager.AMBULANCE_COUNT, 1, t=self.log_transform_alloc_t)
-            else:
-                obs[0:self.nbases] = obs[0:self.nbases] / \
-                    self.requestsPool.maximumRequests
-                obs[self.nbases: 2 * self.nbases] = obs[self.nbases: 2 *
-                                                        self.nbases] / self.ersManager.AMBULANCE_COUNT
+            ...
         else:
-            if self.log_transform_obs:
-                obs[:, :, 0] = self._log_transform(
-                    obs[:, :, 0], self.requestsPool.maximumRequests, 255, t=self.log_transform_req_map_t)
-                obs[:, :, 1] = self._log_transform(
-                    obs[:, :, 1], self.ersManager.AMBULANCE_COUNT, 255, t=self.log_transform_alloc_t)
-            else:
-                obs[:, :, 0] = 255 * obs[:, :, 0] / \
-                    self.requestsPool.maximumRequests
-                obs[:, :, 1] = 255 * obs[:, :, 1] / \
-                    self.ersManager.AMBULANCE_COUNT
+            obs[:, :, 0] = 255 * obs[:, :, 0] / \
+                self.requestsPool.maximumRequests
+            obs[:, :, 1] = 255 * obs[:, :, 1] / \
+                self.ersManager.AMBULANCE_COUNT
             obs[:, :, 2] = 255 * obs[:, :, 2]
             assert np.all(obs <= 255)
             obs = obs.astype(np.uint8)
         return obs
-
-    def _log_transform(self, x, max_x, max_ans, t=1):
-        return max_ans * np.log(1 + x / t) / np.log(1 + max_x / t)
 
     def _getObservation(self, transform=True):
         if not self.discrete_state:

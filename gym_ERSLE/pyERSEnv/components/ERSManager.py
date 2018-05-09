@@ -1,7 +1,7 @@
 import gym_ERSLE.pyERSEnv
 import gymGame
 import numpy as np
-from typing import List, Set
+from typing import List, Set  # noqa: F401
 
 
 class ERSManager(gymGame.GameComponent):
@@ -67,23 +67,23 @@ class ERSManager(gymGame.GameComponent):
         allocated = np.sum(allocation)
         deficit_per_base = allocation_fraction - allocation
         deficit = self.AMBULANCE_COUNT - allocated
-        #print('deficit: {0}'.format(deficit))
+        # print('deficit: {0}'.format(deficit))
         while deficit != 0:
             increase = int(deficit > 0) - int(deficit < 0)
-            #print('increase: {0}'.format(increase))
+            # print('increase: {0}'.format(increase))
             target_base = np.argmax(increase * deficit_per_base)
-            #print('target base: {0}'.format(target_base))
+            # print('target base: {0}'.format(target_base))
             allocation[target_base] += increase
-            #print('alloction: {0}'.format(allocation))
+            # print('alloction: {0}'.format(allocation))
             allocated += increase
             deficit_per_base[target_base] -= increase
             deficit -= increase
-            #print('deficit: {0}'.format(deficit))
+            # print('deficit: {0}'.format(deficit))
         # print(allocation)
         return allocation
 
     def causeAllocation(self, target_allocation):
-        target_allocation = self._normalizedAllocation(target_allocation)
+        # target_allocation = self._normalizedAllocation(target_allocation)
         if sum(target_allocation) != self.AMBULANCE_COUNT:
             raise ValueError(
                 'sum of target_allocation should be same as num_ambs')

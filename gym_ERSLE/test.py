@@ -1,11 +1,11 @@
 import argparse
 import ast
-import gym_ERSLE
+import gym_ERSLE  # noqa: F401
 import gym
 import numpy as np
-import sys
-import typing
+import typing  # noqa: F401
 import time
+from baselines.ers.wrappers import ERStoMMDPWrapper, MMDPActionSpaceNormalizerWrapper
 
 NOOP = 0
 # NOOP = np.array([1,1,3,9,3,1])/18
@@ -18,8 +18,9 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
     print('Evaluating {0} for {1} episodes. Seed={2}'.format(
         env_name, episodes, seed))
     env = gym.make(env_name)  # type: gym.Env
+    env = MMDPActionSpaceNormalizerWrapper(ERStoMMDPWrapper(env))
     if action == 'uniform':
-        action = [1] * env.action_space.shape[0]
+        action = [1 / env.action_space.shape[0]] * env.action_space.shape[0]
     env.seed(seed)
     tstart = time.time()
     Rs = []
@@ -48,6 +49,7 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
     tend = time.time()
     env.close()
     stats = {
+        'episode': ep,
         'av_reward': np.average(Rs),
         'av_blip_reward': np.average(blip_Rs),
         'fps': episodes * 1440 / (tend - tstart),
