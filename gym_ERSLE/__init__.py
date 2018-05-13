@@ -13,8 +13,8 @@ version_to_scene_map = {
     'v8': 'gym_ERSLE:Scene5'
 }
 
-version_to_ambs_map = {'v4': 24, 'v5': 50, 'v6': 32, 'v7': 25, 'v8': 25}
-version_to_bases_map = {'v4': 12, 'v5': 25, 'v6': 25, 'v7': 25, 'v8': 16}
+version_to_ambs_map = {'v4': 24, 'v5': 40, 'v6': 32, 'v7': 24, 'v8': 16}
+version_to_bases_map = {'v4': 12, 'v5': 25, 'v6': 25, 'v7': 25, 'v8': 25}
 
 for version in ['v3', 'v4']:
     for decision_interval in [1, 10, 15, 20, 30, 60, 120, 240, 360, 720, 1440]:
