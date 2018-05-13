@@ -42,7 +42,7 @@ class SgScene(gymGame.Scene):
                 0, self.nambs, shape=[self.nbases], dtype=np.float32)
         if self.discrete_state:
             self.observation_space = spaces.Box(low=np.array([0] * (2 * self.nbases + 1)), high=np.array(
-                [self.max_requests] * self.nbases + [self.nambs] * self.nbases + [1]), dtype=np.float32)
+                [self.max_requests / 100] * self.nbases + [self.nambs] * self.nbases + [1]), dtype=np.float32)
         else:
             self.observation_space = spaces.Box(
                 0, 255, shape=self._get_observation_shape())
