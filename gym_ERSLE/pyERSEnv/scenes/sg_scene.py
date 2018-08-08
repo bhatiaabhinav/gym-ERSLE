@@ -103,20 +103,20 @@ class SgScene(gymGame.Scene):
         # mainRequestsGenerator.getComponent(
         #     gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 2
 
-        # if self.random_blips:
-        #     blipsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, position=np.array([
-        #                                       12 * self.random.random() - 6, 8 * self.random.random() - 4, 0]))
-        #     blipsGenerator.getComponent(
-        #         gym_ERSLE.pyERSEnv.RequestsGenerator).width = 1
-        #     blipsGenerator.getComponent(
-        #         gym_ERSLE.pyERSEnv.RequestsGenerator).height = 1
-        #     blipsGenerator.getComponent(
-        #         gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 0
-        #     blipsGenerator.getComponent(
-        #         gym_ERSLE.pyERSEnv.Blip)._isEnabled = True
-        #     blipsGenerator.getComponent(
-        #         gym_ERSLE.pyERSEnv.Blip).peak_time = self.random.random()
-        #     # print(blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time)
+        if self.random_blips:
+            blipsGenerator = self.instantiate(gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, position=np.array([
+                                              12 * self.random.random() - 6, 8 * self.random.random() - 4, 0]))
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).width = 1
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).height = 1
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.RequestsGenerator).requestsPerHour = 0
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.Blip)._isEnabled = True
+            blipsGenerator.getComponent(
+                gym_ERSLE.pyERSEnv.Blip).peak_time = self.random.random()
+            # print(blipsGenerator.getComponent(gym_ERSLE.pyERSEnv.Blip).peak_time)
 
         # bottomRightRequestsGenerator = self.instantiate(
         #     gym_ERSLE.pyERSEnv.RequestsGeneratorPrefab, np.array([4.55, -0.87, 0]))
