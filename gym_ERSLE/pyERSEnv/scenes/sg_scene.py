@@ -8,13 +8,16 @@ from gym import spaces
 class SgScene(gymGame.Scene):
     metadata = {'render.modes': ['human', 'rgb']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36, ncap=None):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
         self.nbases = nbases
         self.nambs = nambs
         self.nhospitals = nhospitals
+        if ncap is None:
+            ncap = nambs
+        self.ncap = ncap
         self.fullRewardDeadline = 10
         self.decision_interval = decision_interval
         self.dynamic = dynamic
@@ -26,6 +29,7 @@ class SgScene(gymGame.Scene):
             'nbases': nbases,
             'nambs': nambs,
             'nhospitals': nhospitals,
+            'ncap': ncap,
             'discrete_action': discrete_action,
             'discrete_state': discrete_state,
             'decision_interval': decision_interval,
@@ -39,10 +43,10 @@ class SgScene(gymGame.Scene):
             self.action_space = spaces.Discrete(self.nact)
         else:
             self.action_space = spaces.Box(
-                0, self.nambs, shape=[self.nbases], dtype=np.float32)
+                0, self.ncap, shape=[self.nbases], dtype=np.float32)
         if self.discrete_state:
             self.observation_space = spaces.Box(low=np.array([0] * (2 * self.nbases + 1)), high=np.array(
-                [self.max_requests / 100] * self.nbases + [self.nambs] * self.nbases + [1]), dtype=np.float32)
+                [self.max_requests / 100] * self.nbases + [self.ncap] * self.nbases + [1]), dtype=np.float32)
         else:
             self.observation_space = spaces.Box(
                 0, 255, shape=self._get_observation_shape())
