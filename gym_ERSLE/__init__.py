@@ -45,7 +45,7 @@ for version in ['v5', 'v6', 'v7', 'v8']:
             for im in [False, True]:
                 for dynamic in [False, True]:
                     for blips in [False, True]:
-                        for cap in [None, 5]:
+                        for cap in [None, 6, 8, 10]:
                             register(
                                 id='pyERSEnv{0}{1}{2}{3}{4}{5}-{6}'.format(
                                     '-im' if im else '',
