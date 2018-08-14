@@ -45,42 +45,45 @@ for version in ['v5', 'v6', 'v7', 'v8']:
             for im in [False, True]:
                 for dynamic in [False, True]:
                     for blips in [False, True]:
-                        for cap in [None, 6, 8, 10]:
-                            register(
-                                id='pyERSEnv{0}{1}{2}{3}{4}{5}-{6}'.format(
-                                    '-im' if im else '',
-                                    '-ca' if ca else '',
-                                    '-dynamic' if dynamic else '',
-                                    '-blips' if blips else '',
-                                    '-cap{0}'.format(cap) if cap else '',
-                                    '-{0}'.format(
-                                        decision_interval) if decision_interval > 1 else '',
-                                    version
-                                ),
-                                entry_point=version_to_scene_map[version],
-                                kwargs={'discrete_action': not ca, 'discrete_state': not im,
-                                        'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
-                                        'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],
-                                        'nhospitals': 36, 'ncap': cap},
-                                max_episode_steps=10000000,
-                                nondeterministic=False
-                            )
-                            register(
-                                id='SgERSEnv{0}{1}{2}{3}{4}{5}-{6}'.format(
-                                    '-im' if im else '',
-                                    '-ca' if ca else '',
-                                    '-dynamic' if dynamic else '',
-                                    '-blips' if blips else '',
-                                    '-cap{0}'.format(cap) if cap else '',
-                                    '-{0}'.format(
-                                        decision_interval) if decision_interval > 1 else '',
-                                    version
-                                ),
-                                entry_point='gym_ERSLE:SgScene',
-                                kwargs={'discrete_action': not ca, 'discrete_state': not im,
-                                        'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
-                                        'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],
-                                        'nhospitals': 36, 'ncap': cap},
-                                max_episode_steps=10000000,
-                                nondeterministic=False
-                            )
+                        for cap in [None, 2, 4, 6, 8, 10]:
+                            for nmin in [0, 1, 2]:
+                                register(
+                                    id='pyERSEnv{0}{1}{2}{3}{4}{5}{6}-{7}'.format(
+                                        '-im' if im else '',
+                                        '-ca' if ca else '',
+                                        '-dynamic' if dynamic else '',
+                                        '-blips' if blips else '',
+                                        '-min{0}'.format(nmin) if nmin > 0 else '',
+                                        '-cap{0}'.format(cap) if cap else '',
+                                        '-{0}'.format(
+                                            decision_interval) if decision_interval > 1 else '',
+                                        version
+                                    ),
+                                    entry_point=version_to_scene_map[version],
+                                    kwargs={'discrete_action': not ca, 'discrete_state': not im,
+                                            'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
+                                            'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],
+                                            'nhospitals': 36, 'nmin': nmin, 'ncap': cap},
+                                    max_episode_steps=10000000,
+                                    nondeterministic=False
+                                )
+                                register(
+                                    id='SgERSEnv{0}{1}{2}{3}{4}{5}{6}-{7}'.format(
+                                        '-im' if im else '',
+                                        '-ca' if ca else '',
+                                        '-dynamic' if dynamic else '',
+                                        '-blips' if blips else '',
+                                        '-min{0}'.format(nmin) if nmin > 0 else '',
+                                        '-cap{0}'.format(cap) if cap else '',
+                                        '-{0}'.format(
+                                            decision_interval) if decision_interval > 1 else '',
+                                        version
+                                    ),
+                                    entry_point='gym_ERSLE:SgScene',
+                                    kwargs={'discrete_action': not ca, 'discrete_state': not im,
+                                            'decision_interval': decision_interval, 'dynamic': dynamic, 'random_blips': blips,
+                                            'nbases': version_to_bases_map[version], 'nambs': version_to_ambs_map[version],
+                                            'nhospitals': 36, 'nmin': nmin, 'ncap': cap},
+                                    max_episode_steps=10000000,
+                                    nondeterministic=False
+                                )
