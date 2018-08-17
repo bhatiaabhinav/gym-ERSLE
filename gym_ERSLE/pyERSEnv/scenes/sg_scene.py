@@ -8,7 +8,7 @@ from gym import spaces
 class SgScene(gymGame.Scene):
     metadata = {'render.modes': ['human', 'rgb']}
 
-    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36, nmin=None, ncap=None):
+    def __init__(self, discrete_state=True, discrete_action=True, decision_interval=1, dynamic=True, random_blips=True, nbases=25, nambs=36, nhospitals=36, nmin=None, ncap=None, constraints=None):
         super().__init__()
         self.discrete_state = discrete_state
         self.discrete_action = discrete_action
@@ -21,6 +21,7 @@ class SgScene(gymGame.Scene):
             nmin = 0
         self.nmin = nmin
         self.ncap = ncap
+        self.constraints = constraints
         self.fullRewardDeadline = 10
         self.decision_interval = decision_interval
         self.dynamic = dynamic
@@ -34,6 +35,7 @@ class SgScene(gymGame.Scene):
             'nhospitals': nhospitals,
             'nmin': nmin,
             'ncap': ncap,
+            'constraints': constraints,
             'discrete_action': discrete_action,
             'discrete_state': discrete_state,
             'decision_interval': decision_interval,
