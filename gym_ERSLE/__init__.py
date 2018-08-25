@@ -1,9 +1,11 @@
 from gym.envs.registration import register
-from gym_ERSLE.pyERSEnv import ToyScene  # noqa F401
+
 from gym_ERSLE.pyERSEnv import Scene4  # noqa F401
 from gym_ERSLE.pyERSEnv import Scene5  # noqa F401
 from gym_ERSLE.pyERSEnv import SgScene  # noqa F401
-from gym_ERSLE.pyERSEnv.scenes.constraints import build_constraints_min_max_every
+from gym_ERSLE.pyERSEnv import ToyScene  # noqa F401
+from gym_ERSLE.pyERSEnv.scenes.constraints import (build_constraints_2_level_simple,
+                                                   build_constraints_min_max_every)
 
 version_to_scene_map = {
     'v3': 'gym_ERSLE:ToyScene',
@@ -17,7 +19,22 @@ version_to_scene_map = {
 version_to_ambs_map = {'v4': 24, 'v5': 40, 'v6': 32, 'v7': 24, 'v8': 16}
 version_to_bases_map = {'v4': 12, 'v5': 25, 'v6': 25, 'v7': 25, 'v8': 25}
 
-constraints1 = build_constraints_min_max_every(25, 5, 2, 10, 0, 8, nresources=32)
+constraints1 = build_constraints_min_max_every(
+    25, 5, 2, 10, 0, 8, nresources=32)
+
+constraints2 = build_constraints_2_level_simple(25,
+                                                [
+                                                    [0, 1, 5, 6, 7],
+                                                    [2, 3, 4, 8, 9],
+                                                    [10, 15, 20],
+                                                    [11, 12, 16, 17],
+                                                    [13, 14, 18, 19, 24],
+                                                    [21, 22, 23]
+                                                ],
+                                                [2, 2, 1, 2, 2, 1],
+                                                [16, 16, 14, 16, 16, 14],
+                                                0,
+                                                6, nresources=32)
 
 for version in ['v3', 'v4']:
     for decision_interval in [1, 10, 15, 20, 30, 60, 120, 240, 360, 720, 1440]:
@@ -50,7 +67,7 @@ for version in ['v5', 'v6', 'v7', 'v8']:
                     for blips in [False, True]:
                         for cap in [None, 2, 4, 6, 8, 10]:
                             for nmin in [0, 1, 2]:
-                                for constraints in [None, constraints1]:
+                                for constraints in [None, constraints2]:
                                     register(
                                         id='pyERSEnv{0}{1}{2}{3}{4}{5}{6}{7}-{8}'.format(
                                             '-im' if im else '',
@@ -59,7 +76,7 @@ for version in ['v5', 'v6', 'v7', 'v8']:
                                             '-blips' if blips else '',
                                             '-min{0}'.format(nmin) if nmin > 0 else '',
                                             '-cap{0}'.format(cap) if cap else '',
-                                            '-constraints1' if constraints else '',
+                                            '-constraints' if constraints else '',
                                             '-{0}'.format(
                                                 decision_interval) if decision_interval > 1 else '',
                                             version
@@ -80,7 +97,7 @@ for version in ['v5', 'v6', 'v7', 'v8']:
                                             '-blips' if blips else '',
                                             '-min{0}'.format(nmin) if nmin > 0 else '',
                                             '-cap{0}'.format(cap) if cap else '',
-                                            '-constraints1' if constraints else '',
+                                            '-constraints' if constraints else '',
                                             '-{0}'.format(
                                                 decision_interval) if decision_interval > 1 else '',
                                             version
