@@ -5,7 +5,7 @@ import gym
 import numpy as np
 import typing  # noqa: F401
 import time
-from baselines.ers.wrappers import ERStoMMDPWrapper, MMDPActionSpaceNormalizerWrapper, MMDPActionRounderWrapper
+from baselines.ers.wrappers import ERStoMMDPWrapper, MMDPActionSpaceNormalizerWrapper, MMDPActionWrapper
 
 NOOP = 0
 # NOOP = np.array([1,1,3,9,3,1])/18
@@ -18,9 +18,9 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
     print('Evaluating {0} for {1} episodes. Seed={2}'.format(
         env_name, episodes, seed))
     env = gym.make(env_name)  # type: gym.Env
-    env = MMDPActionRounderWrapper(MMDPActionSpaceNormalizerWrapper(ERStoMMDPWrapper(env)))
+    env = MMDPActionWrapper(MMDPActionSpaceNormalizerWrapper(ERStoMMDPWrapper(env)), True)
     if action == 'uniform':
-        action = [1 / env.action_space.shape[0]] * env.action_space.shape[0]
+        action = np.array([1 / env.action_space.shape[0]] * env.action_space.shape[0])
     env.seed(seed)
     tstart = time.time()
     Rs = []
