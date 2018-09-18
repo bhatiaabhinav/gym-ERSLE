@@ -52,6 +52,8 @@ def eval(env_name, episodes=10, render=False, seed=42, action=0):
         'episode': ep,
         'av_reward': np.average(Rs),
         'av_blip_reward': np.average(blip_Rs),
+        'std_reward': np.std(Rs),
+        'std_blip_reward': np.std(blip_Rs),
         'fps': episodes * 1440 / (tend - tstart),
         'eps': episodes / (tend - tstart)
     }
